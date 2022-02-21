@@ -1,8 +1,10 @@
+import logging
+from collections import defaultdict
 from coval.corefud.mention import Mention
 from udapi.core.document import Document
 from udapi.block.read.conllu import Conllu
 
-class DocAlignError(BaseException):
+class DataAlignError(BaseException):
     def __init__(self, key_node, sys_node, misalign_source="Words"):
         self.key_node = key_node
         self.sys_node = sys_node
@@ -14,23 +16,58 @@ class DocAlignError(BaseException):
             str(self.key_node),
             str(self.sys_node))
 
+class CorefFormatError(BaseException):
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return message
+
 def load_conllu(file_path):
     doc = Document()
     conllu_reader = Conllu(files=[file_path])
     conllu_reader.apply_on_document(doc)
     return doc
 
-def check_doc_alignment(doc1, doc2):
-    doc12_trees = zip(doc1.trees, doc2.trees)
-    for tree1, tree2 in doc12_trees:
-        if (tree1.newdoc and not tree2.newdoc) or (not tree1.newdoc and tree2.newdoc):
-            raise DocAlignError(tree1, tree2, "Newdoc labels")
+def check_data_alignment(data1, data2):
+    data12_trees = zip(data1.trees, data2.trees)
+    for tree1, tree2 in data12_trees:
+        if tree1.newdoc != tree2.newdoc:
+            raise DataAlignError(tree1, tree2, "Newdoc labels")
         if tree1.sent_id != tree2.sent_id:
-            raise DocAlignError(tree1, tree2, "Sent IDs")
-        doc12_nodes = zip(tree1.descendants_and_empty, tree2.descendants_and_empty)
-        for node1, node2 in doc12_nodes:
+            raise DataAlignError(tree1, tree2, "Sent IDs")
+        data12_nodes = zip(tree1.descendants_and_empty, tree2.descendants_and_empty)
+        for node1, node2 in data12_nodes:
             if node1.form != node2.form:
-                raise DocAlignError(node1, node2, "Words")
+                raise DataAlignError(node1, node2, "Words")
+
+def split_data_to_docs(data):
+    word2docid = {}
+    docord = 0
+    docid = None
+    for tree in data.trees:
+        if tree.newdoc:
+            docord += 1
+            docid = tree.newdoc if tree.newdoc is not True else docord
+        for node in tree.descendants_and_empty:
+            word2docid[node] = docid
+    doc_clusters = defaultdict(lambda: defaultdict(list))
+
+    for cid, cluster in data.coref_clusters.items():
+        mention_doc = None
+        for mention in cluster.mentions:
+            words_docs = list(set([word2docid[w] for w in mention.words]))
+            if len(words_docs) > 1:
+                mention_str = ", ".join([str(w) for w in mention.words])
+                raise CorefFormatError("Mention cannot cross a document boundary. The following does: " + mention_str)
+            if mention_doc and mention_doc != words_docs[0]:
+                logging.warning("Cluster {:s} spans two documents ({:s}, {:s}). It will be split.")
+            mention_doc = words_docs[0]
+            doc_clusters[mention_doc][cid].append(mention)
+    return doc_clusters
+
+
+
 
 def transform_cluster_for_eval(cluster, nohead=False):
     # TODO: CorefMentions sets the first mention's word as its head if no head is specified
@@ -51,13 +88,18 @@ def get_coref_infos(key_file,
         print_debug=False):
 
     # loading the documents
-    key_doc = load_conllu(key_file)
-    sys_doc = load_conllu(sys_file)
+    key_data = load_conllu(key_file)
+    sys_data = load_conllu(sys_file)
 
-    # checking if key and sys documents are aligned
-    check_doc_alignment(key_doc, sys_doc)
+    # checking if key and sys data are aligned
+    check_data_alignment(key_data, sys_data)
 
-    #TODO check if relations do not cross newdoc boundaries
+    # split data into documents and collect the clusters per document
+    # also checking if relations do not cross document boundaries
+    key_doc_clusters = split_data_to_docs(key_data)
+    sys_doc_clusters = split_data_to_docs(sys_data)
+
+    exit()
 
     key_clusters = {cid: transform_cluster_for_eval(cluster) for cid, cluster in key_doc.coref_clusters.items()}
     sys_clusters = {cid: transform_cluster_for_eval(cluster, True) for cid, cluster in sys_doc.coref_clusters.items()}
