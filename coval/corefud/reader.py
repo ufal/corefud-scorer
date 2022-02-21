@@ -1,3 +1,4 @@
+from coval.corefud.mention import Mention
 from udapi.core.document import Document
 from udapi.block.read.conllu import Conllu
 
@@ -22,7 +23,6 @@ def load_conllu(file_path):
 def check_doc_alignment(doc1, doc2):
     doc12_trees = zip(doc1.trees, doc2.trees)
     for tree1, tree2 in doc12_trees:
-        print("{:d} {:d}".format(tree1.bundle.number, tree2.bundle.number))
         if (tree1.newdoc and not tree2.newdoc) or (not tree1.newdoc and tree2.newdoc):
             raise DocAlignError(tree1, tree2, "Newdoc labels")
         if tree1.sent_id != tree2.sent_id:
@@ -31,6 +31,19 @@ def check_doc_alignment(doc1, doc2):
         for node1, node2 in doc12_nodes:
             if node1.form != node2.form:
                 raise DocAlignError(node1, node2, "Words")
+
+def transform_cluster_for_eval(cluster, nohead=False):
+    # TODO: CorefMentions sets the first mention's word as its head if no head is specified
+    # This is problematic for partial matching of key and sys mention.
+    # For continuous mentions, a key mention is partially matched by the sys mention,
+    # if the sys mention lies within the key mention and covers its head/min at the same time.
+    # It requires the sys mention to have no head/min annotated.
+    # All key mentions in CorefUD data should have their head annotated as they are automatically
+    # added based on the dependency tree. This is, however, a result of running the MoveHead block.
+    # Otherwise, the first mention node is declared to be its head. 
+    # Users applying UDAPI for their own data does not have to know it and thus the partial
+    # matching is not going to work properly for them.
+    return [Mention(m.words, None if nohead else m.head) for m in cluster.mentions]
 
 def get_coref_infos(key_file,
         sys_file,
@@ -45,3 +58,10 @@ def get_coref_infos(key_file,
     check_doc_alignment(key_doc, sys_doc)
 
     #TODO check if relations do not cross newdoc boundaries
+
+    key_clusters = {cid: transform_cluster_for_eval(cluster) for cid, cluster in key_doc.coref_clusters.items()}
+    sys_clusters = {cid: transform_cluster_for_eval(cluster, True) for cid, cluster in sys_doc.coref_clusters.items()}
+
+    print(key_clusters)
+    print(sys_clusters)
+
