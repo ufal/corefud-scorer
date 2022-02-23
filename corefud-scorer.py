@@ -40,17 +40,16 @@ def main():
 def evaluate(key_file, sys_file, metrics, keep_singletons):
 
     # TODO: extract clusters
-    reader.get_coref_infos(key_file, sys_file, keep_singletons)
-    exit()
+    coref_infos = reader.get_coref_infos(key_file, sys_file, keep_singletons)
     
     conll = 0
     conll_subparts_num = 0
   
     for name, metric in metrics:  
-        recall, precision, f1 = evaluator.evaluate_documents(doc_coref_infos,
+        recall, precision, f1 = evaluator.evaluate_documents(coref_infos,
             metric,
             beta=1,
-            only_split_antecedent=only_split_antecedent)
+            only_split_antecedent=False)
         if name in ["muc", "bcub", "ceafe"]:
             conll += f1
             conll_subparts_num += 1
@@ -60,8 +59,8 @@ def evaluate(key_file, sys_file, metrics, keep_singletons):
             ' Precision: %.2f' % (precision * 100),
             ' F1: %.2f' % (f1 * 100))
 
-        if conll_subparts_num == 3:
-            conll = (conll / 3) * 100
-            print('CoNLL score: %.2f' % conll)
+    if conll_subparts_num == 3:
+        conll = (conll / 3) * 100
+        print('CoNLL score: %.2f' % conll)
 
 main()

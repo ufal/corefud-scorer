@@ -66,10 +66,7 @@ def split_data_to_docs(data):
             doc_clusters[mention_doc][cid].append(mention)
     return doc_clusters
 
-
-
-
-def transform_cluster_for_eval(cluster, nohead=False):
+def transform_clusters_for_eval(clusters, nohead=False):
     # TODO: CorefMentions sets the first mention's word as its head if no head is specified
     # This is problematic for partial matching of key and sys mention.
     # For continuous mentions, a key mention is partially matched by the sys mention,
@@ -80,7 +77,28 @@ def transform_cluster_for_eval(cluster, nohead=False):
     # Otherwise, the first mention node is declared to be its head. 
     # Users applying UDAPI for their own data does not have to know it and thus the partial
     # matching is not going to work properly for them.
-    return [Mention(m.words, None if nohead else m.head) for m in cluster.mentions]
+    transformed_clusters = []
+    for cluster in clusters.values():
+        transformed_cluster = [Mention(m.words, None if nohead else m.head) for m in cluster]
+        transformed_clusters.append(transformed_cluster)
+    return transformed_clusters
+
+def process_clusters(clusters, keep_singletons):
+    removed_singletons = 0
+    processed_clusters = []
+    for cluster in clusters:
+        if not keep_singletons and len(cluster) == 1:
+            removed_singletons += 1
+            continue
+        processed_clusters.append(cluster)
+    return processed_clusters, removed_singletons
+
+def get_mention_assignments(clusters):
+    mention_cluster_ids = {}
+    for cluster_id, cluster in enumerate(clusters):
+        for m in cluster:
+            mention_cluster_ids[m] = cluster_id
+    return mention_cluster_ids
 
 def get_coref_infos(key_file,
         sys_file,
@@ -99,11 +117,23 @@ def get_coref_infos(key_file,
     key_doc_clusters = split_data_to_docs(key_data)
     sys_doc_clusters = split_data_to_docs(sys_data)
 
-    exit()
+    doc_coref_infos = {}
 
-    key_clusters = {cid: transform_cluster_for_eval(cluster) for cid, cluster in key_doc.coref_clusters.items()}
-    sys_clusters = {cid: transform_cluster_for_eval(cluster, True) for cid, cluster in sys_doc.coref_clusters.items()}
+    for docname in key_doc_clusters:
+        assert docname in sys_doc_clusters
 
-    print(key_clusters)
-    print(sys_clusters)
+        key_clusters = transform_clusters_for_eval(key_doc_clusters[docname])
+        sys_clusters = transform_clusters_for_eval(sys_doc_clusters[docname], True)
 
+        key_clusters, key_removed_singletons = process_clusters(key_clusters, keep_singletons)
+        sys_clusters, sys_removed_singletons = process_clusters(sys_clusters, keep_singletons)
+
+        key_mention_to_cluster = get_mention_assignments(key_clusters)
+        sys_mention_to_cluster = get_mention_assignments(sys_clusters)
+
+        doc_coref_infos[docname] = (key_clusters, sys_clusters,
+            key_mention_to_cluster, sys_mention_to_cluster)
+
+        logging.debug("Singletons removed: key={:d}, sys={:d}".format(key_removed_singletons, sys_removed_singletons))
+
+    return doc_coref_infos

@@ -25,6 +25,9 @@ class Mention:
         def __ne__(self, other):
             return not self.__eq__(other)
 
+        def __le__(self, other):
+            return self.__lt__(other) or self.__eq__(other)
+
         def __str__(self):
             return "{:d}-{:d}".format(self._sentord, self._wordord)
 
