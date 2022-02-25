@@ -72,7 +72,6 @@ class Mention:
         
 
     def __eq__(self, other):
-        print("RUNNING MENTION.__eq__")
         if isinstance(other, self.__class__):
             return self._partial_left_right_match(other)
         return NotImplemented
