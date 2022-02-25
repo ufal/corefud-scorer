@@ -1,5 +1,5 @@
 import logging
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from coval.corefud.mention import Mention
 from udapi.core.document import Document
 from udapi.block.read.conllu import Conllu
@@ -80,6 +80,8 @@ def transform_clusters_for_eval(clusters, nohead=False):
     transformed_clusters = []
     for cluster in clusters.values():
         transformed_cluster = [Mention(m.words, None if nohead else m.head) for m in cluster]
+        # TODO: evaluator tests (TC-A-7.response) require to delete duplicate mention spans
+        transformed_cluster = list(OrderedDict.fromkeys(transformed_cluster))
         transformed_clusters.append(transformed_cluster)
     return transformed_clusters
 
@@ -102,8 +104,7 @@ def get_mention_assignments(clusters):
 
 def get_coref_infos(key_file,
         sys_file,
-        keep_singletons,
-        print_debug=False):
+        keep_singletons=True):
 
     # loading the documents
     key_data = load_conllu(key_file)
