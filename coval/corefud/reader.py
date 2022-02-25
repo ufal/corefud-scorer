@@ -131,8 +131,11 @@ def get_coref_infos(key_file,
         key_mention_to_cluster = get_mention_assignments(key_clusters)
         sys_mention_to_cluster = get_mention_assignments(sys_clusters)
 
+        # for an unknown reason, coval.eval expects the tuple where 
+        # key_mention_to_cluster and sys_mention_to_cluster are 
+        # in the opposite order than key_cluster and sys_cluster
         doc_coref_infos[docname] = (key_clusters, sys_clusters,
-            key_mention_to_cluster, sys_mention_to_cluster)
+            sys_mention_to_cluster, key_mention_to_cluster)
 
         logging.debug("Singletons removed: key={:d}, sys={:d}".format(key_removed_singletons, sys_removed_singletons))
 

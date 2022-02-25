@@ -31,6 +31,9 @@ class Mention:
         def __str__(self):
             return "{:d}-{:d}".format(self._sentord, self._wordord)
 
+        def __repr__(self):
+            return str(self)
+
         def __hash__(self):
             return hash((self._sentord, self._wordord))
             
@@ -38,6 +41,8 @@ class Mention:
         self.words = [Mention.WordOrd(n) for n in nodes]
         if head:
             self.head = Mention.WordOrd(head)
+        else:
+            self.head = None
 
     def _exact_match(self, other):
         if len(self.words) != len(other.words):
@@ -67,6 +72,7 @@ class Mention:
         
 
     def __eq__(self, other):
+        print("RUNNING MENTION.__eq__")
         if isinstance(other, self.__class__):
             return self._partial_left_right_match(other)
         return NotImplemented
@@ -78,4 +84,7 @@ class Mention:
         return hash(frozenset(self.words))
 
     def __str__(self):
-        return "({:s})".format(",".join(self.words))
+        return "({:s})".format(",".join([str(w) for w in self.words]))
+
+    def __repr__(self):
+        return str(self)
