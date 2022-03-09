@@ -39,6 +39,7 @@ class Mention:
             
     def __init__(self, nodes, head=None):
         self.words = [Mention.WordOrd(n) for n in nodes]
+        self.wordsset = set(self.words)
         if head:
             self.head = Mention.WordOrd(head)
         else:
@@ -69,11 +70,20 @@ class Mention:
                 and self.words[-1] >= other.head)
         else:
             return self._left_right_match(other)
-        
+
+    def _partial_subset_match(self, other):
+        if self.head:
+            return (other.wordsset.issubset(self.wordsset) \
+                and self.head in other.wordsset)
+        elif other.head:
+            return (self.wordsset.issubset(other.wordsset) \
+                and other.head in self.wordsset)
+        else:
+            return self._left_right_match(other)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self._partial_left_right_match(other)
+            return self._partial_subset_match(other)
         return NotImplemented
 
     def __ne__(self, other):
