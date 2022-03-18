@@ -1,3 +1,41 @@
+import sys
+from collections import defaultdict
+
+class MentionDict:
+    def __init__(self, d):
+        self.dict = d
+        self.word2mention = defaultdict(list)
+        for m in d:
+            if not isinstance(m, Mention):
+                raise TypeError("An instance of MentionDict must be initialized by a dictionary indexed by {:s} classes, got {:s}.".format(
+                        Mention.__name__,
+                        str(type(m))))
+            for w in m.words:
+                self.word2mention[w].append(m)
+
+    def _fuzzy_find(self, m1):
+        for w in m1.words:
+            if w in self.word2mention:
+                for m2 in self.word2mention[w]:
+                    if m1 == m2:
+                        return m2
+        return None
+
+    def __contains__(self, m1):
+        if isinstance(m1, Mention):
+            m2 = self._fuzzy_find(m1)
+            return m2 is not None
+        return NotImplemented
+
+    def __getitem__(self, m1):
+        if isinstance(m1, Mention):
+            m2 = self._fuzzy_find(m1)
+            if m2 is not None:
+                return self.dict[m2]
+            else:
+                raise KeyError(m2)
+        return NotImplemented
+
 class Mention:
     
     class WordOrd:
@@ -93,7 +131,7 @@ class Mention:
         return hash(frozenset(self.words))
 
     def __str__(self):
-        return "({:s})".format(",".join([str(w) for w in self.words]))
+        return "({:s})".format(",".join([str(w)+"*" if self.head and self.head == w else str(w) for w in self.words]))
 
     def __repr__(self):
         return str(self)

@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict, OrderedDict
-from coval.corefud.mention import Mention
+from coval.corefud.mention import Mention, MentionDict
 from udapi.core.document import Document
 from udapi.block.read.conllu import Conllu
 
@@ -100,7 +100,7 @@ def get_mention_assignments(clusters):
     for cluster_id, cluster in enumerate(clusters):
         for m in cluster:
             mention_cluster_ids[m] = cluster_id
-    return mention_cluster_ids
+    return MentionDict(mention_cluster_ids)
 
 def get_coref_infos(key_file,
         sys_file,
