@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1, '..')
 from pytest import approx
 from coval.corefud.reader import get_coref_infos
 from coval.eval.evaluator import evaluate_documents as evaluate
@@ -7,7 +9,7 @@ TOL = 1e-4
 
 
 def read(key, response):
-  return get_coref_infos('corefud_tests/%s' % key, 'corefud_tests/%s' % response, True)
+  return get_coref_infos('%s' % key, '%s' % response, True)
 
 def test_A1():
   doc = read('TC-A.key', 'TC-A-1.response')
@@ -336,3 +338,80 @@ def test_N6():
   # the original is wrong as the |C_r| != 0
   # assert evaluate(doc, [blancc, blancn]) == approx([0.13333, 0.18182, 0.15385], abs=TOL)
   assert evaluate(doc, [blancc, blancn]) == approx([0.13333/2, 0.18182/2, 0.15385/2], abs=TOL)
+
+############################# TESTS ON NON-CONTIGUOUS MENTIONS ##############################
+
+def test_NCMA1():
+  doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-1.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_NCMA2():
+  doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-2.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_NCMA3():
+  doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-3.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMA4():
+  doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-4.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMA5():
+  doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-5.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_NCMA6():
+  doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-6.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMA7():
+  doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-7.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB1():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-1.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_NCMB2():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-2.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_NCMB3():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-3.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB4():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-4.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB5():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-5.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB6():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-6.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB7():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-7.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB8():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-8.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)

@@ -1,5 +1,7 @@
 SHELL=/bin/bash
 
+CONLL_TEST_DIR=../tests
+
 # converting CoNLL 2012 unit tests to the CorefUD 1.0 format
 # in the original CoNLL 2012 unit tests, there are no heads or min-spans labeled
 #     => a mention is matched only if it matches both the start and the end of the key mention
@@ -12,13 +14,12 @@ SHELL=/bin/bash
 # the best solution would be to allow CorefMention in UDAPI to have no head set
 # this might be in conflict with other things, though
 convert_tests:
-	mkdir -p corefud_tests
-	for f in tests/*.{response,key}; do\
+	for f in $(CONLL_TEST_DIR)/*.{response,key}; do\
 		file=`basename $$f`;\
-		python convert_test_files.py < $$f > corefud_tests/$$file;\
+		python convert_test_files.py < $$f > $$file;\
 	done
-	sed -i 's/^\(4.*Entity=(e1-x\)-1-$$/\1-4-/' corefud_tests/TC-A.key
-	sed -i 's/^\(8.*Entity=(e2-x\)-1-$$/\1-2-/' corefud_tests/TC-A.key
+	sed -i 's/^\(4.*Entity=(e1-x\)-1-$$/\1-4-/' TC-A.key
+	sed -i 's/^\(8.*Entity=(e2-x\)-1-$$/\1-2-/' TC-A.key
 
 corefud_test :
 	pytest corefud-unittests.py
