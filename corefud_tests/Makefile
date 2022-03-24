@@ -18,8 +18,6 @@ convert_tests:
 		file=`basename $$f`;\
 		python convert_test_files.py < $$f > $$file;\
 	done
-	sed -i 's/^\(4.*Entity=(e1-x\)-1-$$/\1-4-/' TC-A.key
-	sed -i 's/^\(8.*Entity=(e2-x\)-1-$$/\1-2-/' TC-A.key
 
 corefud_test :
 	pytest corefud-unittests.py
