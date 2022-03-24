@@ -348,36 +348,70 @@ def test_NCMA1():
 
 def test_NCMA2():
   doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-2.response')
-  print(doc, file=sys.stderr)
   assert evaluate(doc, muc) == (1, 1, 1)
   assert evaluate(doc, b_cubed) == (1, 1, 1)
 
 def test_NCMA3():
   doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-3.response')
-  print(doc, file=sys.stderr)
   assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
   assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
 
 def test_NCMA4():
   doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-4.response')
-  print(doc, file=sys.stderr)
   assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
   assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
 
 def test_NCMA5():
   doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-5.response')
-  print(doc, file=sys.stderr)
   assert evaluate(doc, muc) == (1, 1, 1)
   assert evaluate(doc, b_cubed) == (1, 1, 1)
 
 def test_NCMA6():
   doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-6.response')
-  print(doc, file=sys.stderr)
   assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
   assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
 
 def test_NCMA7():
   doc = read('noncontig_mentions/TC-NCMA.key', 'noncontig_mentions/TC-NCMA-7.response')
-  print(doc, file=sys.stderr)
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB1():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-1.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_NCMB2():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-2.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_NCMB3():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-3.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB4():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-4.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB5():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-5.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB6():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-6.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB7():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-7.response')
+  assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
+  assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+def test_NCMB8():
+  doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-8.response')
   assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
   assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
