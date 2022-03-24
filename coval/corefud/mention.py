@@ -89,6 +89,35 @@ class Mention:
         sorted_words_zip = zip(sorted(self.words), sorted(other.words))
         return all(self_w == other_w for self_w, other_w in sorted_words_zip)
 
+    def _partial_subset_match(self, other):
+        if self.head:
+            return (other.wordsset.issubset(self.wordsset) \
+                and self.head in other.wordsset)
+        elif other.head:
+            return (self.wordsset.issubset(other.wordsset) \
+                and other.head in self.wordsset)
+        else:
+            return self._exact_match(other)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._partial_subset_match(other)
+        return NotImplemented
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(frozenset(self.words))
+
+    def __str__(self):
+        return "({:s})".format(",".join([str(w)+"*" if self.head and self.head == w else str(w) for w in self.words]))
+
+    def __repr__(self):
+        return str(self)
+
+###### UNUSED MENTION MATCHING STRATEGIES #######
+
     def _left_right_match(self, other):
         if self.words[0] == other.words[0] \
             and self.words[-1] == other.words[-1]:
@@ -108,30 +137,3 @@ class Mention:
                 and self.words[-1] >= other.head)
         else:
             return self._left_right_match(other)
-
-    def _partial_subset_match(self, other):
-        if self.head:
-            return (other.wordsset.issubset(self.wordsset) \
-                and self.head in other.wordsset)
-        elif other.head:
-            return (self.wordsset.issubset(other.wordsset) \
-                and other.head in self.wordsset)
-        else:
-            return self._left_right_match(other)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self._partial_subset_match(other)
-        return NotImplemented
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return hash(frozenset(self.words))
-
-    def __str__(self):
-        return "({:s})".format(",".join([str(w)+"*" if self.head and self.head == w else str(w) for w in self.words]))
-
-    def __repr__(self):
-        return str(self)

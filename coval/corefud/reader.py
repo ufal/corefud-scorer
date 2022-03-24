@@ -104,6 +104,7 @@ def get_mention_assignments(clusters):
 
 def get_coref_infos(key_file,
         sys_file,
+        exact_matching=False,
         keep_singletons=True):
 
     # loading the documents
@@ -123,7 +124,7 @@ def get_coref_infos(key_file,
     for docname in key_doc_clusters:
         assert docname in sys_doc_clusters
 
-        key_clusters = transform_clusters_for_eval(key_doc_clusters[docname])
+        key_clusters = transform_clusters_for_eval(key_doc_clusters[docname], exact_matching)
         sys_clusters = transform_clusters_for_eval(sys_doc_clusters[docname], True)
 
         key_clusters, key_removed_singletons = process_clusters(key_clusters, keep_singletons)

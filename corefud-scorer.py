@@ -16,6 +16,11 @@ def main():
         keep_singletons = False
     else:
         keep_singletons = True
+
+    if 'exact_matching' in sys.argv or 'exact_match' in sys.argv:
+        exact_matching = True
+    else:
+        exact_matching = False
   
     if 'all' in sys.argv:
         metrics = [(k, metric_dict[k]) for k in metric_dict]
@@ -35,12 +40,12 @@ def main():
   
     print('The scorer is evaluating ', msg)
 
-    evaluate(key_file, sys_file, metrics, keep_singletons)
+    evaluate(key_file, sys_file, metrics, exact_matching, keep_singletons)
 
-def evaluate(key_file, sys_file, metrics, keep_singletons):
+def evaluate(key_file, sys_file, metrics, exact_matching, keep_singletons):
 
     # TODO: extract clusters
-    coref_infos = reader.get_coref_infos(key_file, sys_file, keep_singletons)
+    coref_infos = reader.get_coref_infos(key_file, sys_file, exact_matching, keep_singletons)
     
     conll = 0
     conll_subparts_num = 0
