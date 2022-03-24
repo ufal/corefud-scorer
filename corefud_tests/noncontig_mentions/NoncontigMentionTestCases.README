@@ -10,7 +10,7 @@ Expected: MENTION=1 [recall=5/5=1, prec=5/5=1]
                     d: [recall=2/2=1, prec=2/2=1]
                     e: [recall=1/1=1, prec=1/1=1]
 
-TC-NCMA-1 - response "a" is a contiguous subset of key "a" and covers its head:
+TC-NCMA-2 - response "a" is a contiguous subset of key "a" and covers its head:
 Key/Ref: {(a:2-9,10*,11-13) (c:48*)} {(b:30*,32-33) (d:63*,64) (e:67*)}
 Rsp/Sys: {(a:5-12)          (c:48) } {(b:30-33)     (d:63-64)  (e:67) }
 Expected: BCUB=1 [recall=6/6, prec=6/6]
