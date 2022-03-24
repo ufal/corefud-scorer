@@ -8,11 +8,11 @@ from coval.eval.evaluator import muc, b_cubed, ceafe, lea, ceafm,blancc,blancn
 TOL = 1e-4
 
 
-def read(key, response):
-  return get_coref_infos('%s' % key, '%s' % response, True)
+def read(key, response, exact_match=False):
+  return get_coref_infos('%s' % key, '%s' % response, exact_match, True)
 
 def test_A1():
-  doc = read('TC-A.key', 'TC-A-1.response')
+  doc = read('TC-A.key', 'TC-A-1.response', exact_match=True)
   assert evaluate(doc, muc) == (1, 1, 1)
   assert evaluate(doc, b_cubed) == (1, 1, 1)
   assert evaluate(doc, ceafe) == (1, 1, 1)
@@ -22,7 +22,7 @@ def test_A1():
 
 
 def test_A2():
-  doc = read('TC-A.key', 'TC-A-2.response')
+  doc = read('TC-A.key', 'TC-A-2.response', exact_match=True)
   assert evaluate(doc, muc) == approx([1 / 3, 1 / 1, 1 / 2])
   assert evaluate(doc, b_cubed) == approx([(7 / 3) / 6, 3 / 3, 14 / 25])
   assert evaluate(doc, ceafe) == approx([0.6, 0.9, 0.72])
@@ -31,7 +31,7 @@ def test_A2():
   assert evaluate(doc, [blancc,blancn]) == approx([0.21591, 1, 0.35385], abs=TOL)
 
 def test_A3():
-  doc = read('TC-A.key', 'TC-A-3.response')
+  doc = read('TC-A.key', 'TC-A-3.response', exact_match=True)
   assert evaluate(doc, muc) == approx([3 / 3, 3 / 5, 0.75])
   assert evaluate(doc,
       b_cubed) == approx([6 / 6, (4 + 7 / 12) / 9, 110 / 163])
@@ -45,7 +45,7 @@ def test_A3():
   assert evaluate(doc, [blancc, blancn]) == approx([1, 0.42593, 0.59717], abs=TOL)
 
 def test_A4():
-  doc = read('TC-A.key', 'TC-A-4.response')
+  doc = read('TC-A.key', 'TC-A-4.response', exact_match=True)
   assert evaluate(doc, muc) == approx([1 / 3, 1 / 3, 1 / 3])
   assert evaluate(doc, b_cubed) == approx([
       (3 + 1 / 3) / 6, (1 + 4 / 3 + 1 / 2) / 7,
@@ -59,7 +59,7 @@ def test_A4():
   assert evaluate(doc, [blancc, blancn]) == approx([0.35227, 0.27206, 0.30357], abs=TOL)
 
 def test_A5():
-  doc = read('TC-A.key', 'TC-A-5.response')
+  doc = read('TC-A.key', 'TC-A-5.response', exact_match=True)
   assert evaluate(doc, muc) == approx([1 / 3, 1 / 4, 2 / 7])
   assert evaluate(doc, b_cubed) == approx([
       (3 + 1 / 3) / 6, 2.5 / 8,
@@ -75,7 +75,7 @@ def test_A5():
 
 
 def test_A6():
-  doc = read('TC-A.key', 'TC-A-6.response')
+  doc = read('TC-A.key', 'TC-A-6.response', exact_match=True)
   assert evaluate(doc, muc) == approx([1 / 3, 1 / 4, 2 / 7])
   assert evaluate(doc, b_cubed) == approx([
       (10 / 3) / 6, (1 + 4 / 3 + 1 / 2) / 8,
@@ -90,7 +90,7 @@ def test_A6():
 
 
 def test_A7():
-  doc = read('TC-A.key', 'TC-A-7.response')
+  doc = read('TC-A.key', 'TC-A-7.response', exact_match=True)
   assert evaluate(doc, muc) == approx([1 / 3, 1 / 3, 1 / 3])
   assert evaluate(doc, b_cubed) == approx([
       (10 / 3) / 6, (1 + 4 / 3 + 1 / 2) / 7,
@@ -105,7 +105,7 @@ def test_A7():
 
 
 def test_A10():
-  doc = read('TC-A.key', 'TC-A-10.response')
+  doc = read('TC-A.key', 'TC-A-10.response', exact_match=True)
   assert evaluate(doc, muc) == approx([0, 0, 0])
   assert evaluate(doc, b_cubed) == approx([3 / 6, 6 / 6, 2 / 3])
   assert evaluate(doc, lea) == approx(
@@ -114,7 +114,7 @@ def test_A10():
 
 
 def test_A11():
-  doc = read('TC-A.key', 'TC-A-11.response')
+  doc = read('TC-A.key', 'TC-A-11.response', exact_match=True)
   assert evaluate(doc, muc) == approx([3 / 3, 3 / 5, 6 / 8])
   assert evaluate(doc, b_cubed) == approx(
       [6 / 6, (1 / 6 + 2 * 2 / 6 + 3 * 3 / 6) / 6, 14 / 25])
@@ -124,7 +124,7 @@ def test_A11():
   assert evaluate(doc, [blancc, blancn]) == approx([0.5, 0.13333, 0.21053], abs=TOL)
 
 def test_A12():
-  doc = read('TC-A.key', 'TC-A-12.response')
+  doc = read('TC-A.key', 'TC-A-12.response', exact_match=True)
   assert evaluate(doc, muc) == approx([0, 0, 0])
   assert evaluate(doc, b_cubed) == approx([
       (1 + 1 / 2 + 2 / 3) / 6, 4 / 7,
@@ -135,7 +135,7 @@ def test_A12():
   assert evaluate(doc, [blancc, blancn]) == approx([0.22727, 0.11905, 0.15625], abs=TOL)
 
 def test_A13():
-  doc = read('TC-A.key', 'TC-A-13.response')
+  doc = read('TC-A.key', 'TC-A-13.response', exact_match=True)
   assert evaluate(doc, muc) == approx([1 / 3, 1 / 6, 2 / 9])
   assert evaluate(doc, b_cubed) == approx([
       (1 + 1 / 2 + 2 * 2 / 3) / 6, (1 / 7 + 1 / 7 + 2 * 2 / 7) / 7,
@@ -147,13 +147,13 @@ def test_A13():
   assert evaluate(doc, [blancc, blancn]) == approx([0.125, 0.02381, 0.04], abs=TOL)
 
 def test_B1():
-  doc = read('TC-B.key', 'TC-B-1.response')
+  doc = read('TC-B.key', 'TC-B-1.response', exact_match=True)
   assert evaluate(doc, lea) == approx([(2 * 0 + 3 / 3) / 5, (3 * 0 + 2) / 5,
       2 * 1 / 5 * 2 / 5 / (1 / 5 + 2 / 5)])
   assert evaluate(doc, [blancc, blancn]) == approx([1/2 * (1/4 + 1/3), 1/2 * (1/4 + 1/3), 1/2 * (1/4 + 1/3)])
 
 def test_C1():
-  doc = read('TC-C.key', 'TC-C-1.response')
+  doc = read('TC-C.key', 'TC-C-1.response', exact_match=True)
   assert evaluate(doc, lea) == approx([(2 * 0 + 3 / 3 + 2) / 7,
       (3 * 0 + 2 + 2) / 7,
       2 * 3 / 7 * 4 / 7 / (3 / 7 + 4 / 7)])
@@ -161,7 +161,7 @@ def test_C1():
 
 
 def test_D1():
-  doc = read('TC-D.key', 'TC-D-1.response')
+  doc = read('TC-D.key', 'TC-D-1.response', exact_match=True)
   assert evaluate(doc, muc) == approx(
       [9 / 9, 9 / 10, 2 * (9 / 9) * (9 / 10) / (9 / 9 + 9 / 10)])
   assert evaluate(doc, b_cubed) == approx([
@@ -173,7 +173,7 @@ def test_D1():
   ])
 
 def test_E1():
-  doc = read('TC-E.key', 'TC-E-1.response')
+  doc = read('TC-E.key', 'TC-E-1.response', exact_match=True)
   assert evaluate(doc, muc) == approx(
       [9 / 9, 9 / 10, 2 * (9 / 9) * (9 / 10) / (9 / 9 + 9 / 10)])
   assert evaluate(doc, b_cubed) == approx(
@@ -184,14 +184,14 @@ def test_E1():
         / (1 + ((10 * (20 / 45) + 2) / 12))])
 
 def test_F1():
-  doc = read('TC-F.key', 'TC-F-1.response')
+  doc = read('TC-F.key', 'TC-F-1.response', exact_match=True)
   assert evaluate(doc, muc) == approx(
       [2 / 3, 2 / 2, 2 * (2 / 3) * (2 / 2) / (2 / 3 + 2 / 2)])
   assert evaluate(doc, lea) == approx(
       [4 * (2 / 6) / 4, (2 + 2) / 4, 2 * 2 / 6 * 1 / (1 + 2 / 6)])
 
 def test_G1():
-  doc = read('TC-G.key', 'TC-G-1.response')
+  doc = read('TC-G.key', 'TC-G-1.response', exact_match=True)
   assert evaluate(doc, muc) == approx(
       [2 / 2, 2 / 3, 2 * (2 / 2) * (2 / 3) / (2 / 2 + 2 / 3)])
   assert evaluate(doc, lea) == approx(
@@ -199,13 +199,13 @@ def test_G1():
 
 
 def test_H1():
-  doc = read('TC-H.key', 'TC-H-1.response')
+  doc = read('TC-H.key', 'TC-H-1.response', exact_match=True)
   assert evaluate(doc, muc) == approx([1, 1, 1])
   assert evaluate(doc, lea) == approx([1, 1, 1])
 
 
 def test_I1():
-  doc = read('TC-I.key', 'TC-I-1.response')
+  doc = read('TC-I.key', 'TC-I-1.response', exact_match=True)
   assert evaluate(doc, muc) == approx(
       [2 / 3, 2 / 2, 2 * (2 / 3) * (2 / 2) / (2 / 3 + 2 / 2)])
   assert evaluate(doc, lea) == approx(
@@ -214,7 +214,7 @@ def test_I1():
 
 
 def test_J1():
-  doc = read('TC-J.key', 'TC-J-1.response')
+  doc = read('TC-J.key', 'TC-J-1.response', exact_match=True)
   assert evaluate(doc, muc) == approx(
       [1 / 2, 1 / 1, 2 * (1 / 2) * (1 / 1) / (1 / 2 + 1 / 1)])
   assert evaluate(doc, lea) == approx([(3 * 1 / 3) / 3, 1,
@@ -223,7 +223,7 @@ def test_J1():
 
 
 def test_K1():
-  doc = read('TC-K.key', 'TC-K-1.response')
+  doc = read('TC-K.key', 'TC-K-1.response', exact_match=True)
   assert evaluate(doc, muc) == approx([3 / 6, 3 / 6, 3 / 6])
   assert evaluate(doc,
       lea) == approx([(7 * (1 + 1 + 1) / 21) / 7,
@@ -233,7 +233,7 @@ def test_K1():
 
 
 def test_L1():
-  doc = read('TC-L.key', 'TC-L-1.response')
+  doc = read('TC-L.key', 'TC-L-1.response', exact_match=True)
   assert evaluate(doc, muc) == approx(
       [2 / 5, 2 / 4, 2 * (2 / 5) * (2 / 4) / (2 / 5 + 2 / 4)])
   assert evaluate(doc, lea) == approx([
@@ -244,7 +244,7 @@ def test_L1():
 
 
 def test_M1():
-  doc = read('TC-M.key', 'TC-M-1.response')
+  doc = read('TC-M.key', 'TC-M-1.response', exact_match=True)
   assert evaluate(doc, muc) == approx([1, 1, 1])
   assert evaluate(doc, b_cubed) == approx([1, 1, 1])
   assert evaluate(doc, ceafe) == approx([1, 1, 1])
@@ -254,13 +254,13 @@ def test_M1():
 
 
 def test_M2():
-  doc = read('TC-M.key', 'TC-M-2.response')
+  doc = read('TC-M.key', 'TC-M-2.response', exact_match=True)
   assert evaluate(doc, muc) == approx([0, 0, 0])
   assert evaluate(doc, lea) == approx([0, 0, 0])
   assert evaluate(doc, [blancc, blancn]) == approx([0, 0, 0])
 
 def test_M3():
-  doc = read('TC-M.key', 'TC-M-3.response')
+  doc = read('TC-M.key', 'TC-M-3.response', exact_match=True)
   assert evaluate(doc, lea) == approx([
       6 * (4 / 15) / 6, (2 + 3 + 0) / 6,
       2 * 4 / 15 * 5 / 6 / (4 / 15 + 5 / 6)
@@ -271,7 +271,7 @@ def test_M3():
 
 
 def test_M4():
-  doc = read('TC-M.key', 'TC-M-4.response')
+  doc = read('TC-M.key', 'TC-M-4.response', exact_match=True)
   assert evaluate(doc, lea) == approx([
       6 * (3 / 15) / 6, 6 * (3 / 15) / 6,
       2 * 3 / 15 * 3 / 15 / (3 / 15 + 3 / 15)
@@ -280,14 +280,14 @@ def test_M4():
 
 
 def test_M5():
-  doc = read('TC-M.key', 'TC-M-5.response')
+  doc = read('TC-M.key', 'TC-M-5.response', exact_match=True)
   assert evaluate(doc, muc) == approx([0, 0, 0])
   assert evaluate(doc, lea) == approx([0, 0, 0])
   assert evaluate(doc, [blancc, blancn]) == approx([0, 0, 0])
 
 
 def test_M6():
-  doc = read('TC-M.key', 'TC-M-6.response')
+  doc = read('TC-M.key', 'TC-M-6.response', exact_match=True)
   assert evaluate(doc, lea) == approx([
       6 * (1 / 15) / 6, (2 + 3 * 0 + 1 * 0) / 6,
       2 * 1 / 15 * 2 / 6 / (1 / 15 + 2 / 6)
@@ -298,21 +298,21 @@ def test_M6():
 
 
 def test_N1():
-  doc = read('TC-N.key', 'TC-N-1.response')
+  doc = read('TC-N.key', 'TC-N-1.response', exact_match=True)
   assert evaluate(doc, muc) == approx([0, 0, 0])
   assert evaluate(doc, lea) == approx([1, 1, 1])
   assert evaluate(doc, [blancc, blancn]) == approx([1, 1, 1])
 
 
 def test_N2():
-  doc = read('TC-N.key', 'TC-N-2.response')
+  doc = read('TC-N.key', 'TC-N-2.response', exact_match=True)
   assert evaluate(doc, muc) == approx([0, 0, 0])
   assert evaluate(doc, lea) == approx([0, 0, 0])
   assert evaluate(doc, [blancc, blancn]) == approx([0, 0, 0])
 
 
 def test_N3():
-  doc = read('TC-N.key', 'TC-N-3.response')
+  doc = read('TC-N.key', 'TC-N-3.response', exact_match=True)
   assert evaluate(doc, lea) == approx([1 / 6, 1 / 6, 1 / 6])
   # the original is wrong as the |C_r| != 0
   # assert evaluate(doc, [blancc, blancn]) == approx([0.73333, 1, 0.84615], abs=TOL)
@@ -320,20 +320,20 @@ def test_N3():
 
 
 def test_N4():
-  doc = read('TC-N.key', 'TC-N-4.response')
+  doc = read('TC-N.key', 'TC-N-4.response', exact_match=True)
   assert evaluate(doc, muc) == approx([0, 0, 0])
   assert evaluate(doc, lea) == approx([3 / 6, 3 / 6, 3 / 6])
   assert evaluate(doc, [blancc, blancn]) == approx([0.2, 0.2, 0.2])
 
 
 def test_N5():
-  doc = read('TC-N.key', 'TC-N-5.response')
+  doc = read('TC-N.key', 'TC-N-5.response', exact_match=True)
   assert evaluate(doc, lea) == approx([0, 0, 0])
   assert evaluate(doc, [blancc, blancn]) == approx([0, 0, 0])
 
 
 def test_N6():
-  doc = read('TC-N.key', 'TC-N-6.response')
+  doc = read('TC-N.key', 'TC-N-6.response', exact_match=True)
   assert evaluate(doc, lea) == approx([0, 0, 0])
   # the original is wrong as the |C_r| != 0
   # assert evaluate(doc, [blancc, blancn]) == approx([0.13333, 0.18182, 0.15385], abs=TOL)
