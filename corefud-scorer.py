@@ -12,10 +12,10 @@ def main():
     key_file = sys.argv[1]
     sys_file = sys.argv[2]
   
-    if 'remove_singletons' in sys.argv or 'remove_singleton' in sys.argv:
-        keep_singletons = False
-    else:
+    if 'keep_singletons' in sys.argv or 'keep_singleton' in sys.argv:
         keep_singletons = True
+    else:
+        keep_singletons = False
 
     if 'exact_matching' in sys.argv or 'exact_match' in sys.argv:
         exact_matching = True
