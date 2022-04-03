@@ -339,6 +339,12 @@ def test_N6():
   # assert evaluate(doc, [blancc, blancn]) == approx([0.13333, 0.18182, 0.15385], abs=TOL)
   assert evaluate(doc, [blancc, blancn]) == approx([0.13333/2, 0.18182/2, 0.15385/2], abs=TOL)
 
+#################################### EXTRA BASIC TESTS ######################################
+
+def test_O1():
+  doc = read('TC-O.key', 'TC-O-1.response', exact_match=True)
+  assert evaluate(doc, b_cubed) == approx([4/9, 4/15, 1/3], abs=TOL)
+
 ############################# TESTS ON NON-CONTIGUOUS MENTIONS ##############################
 
 def test_NCMA1():
