@@ -415,3 +415,86 @@ def test_NCMB8():
   doc = read('noncontig_mentions/TC-NCMB.key', 'noncontig_mentions/TC-NCMB-8.response')
   assert evaluate(doc, muc) == (2/3, 2/3, 2/3)
   assert evaluate(doc, b_cubed) == (7/10, 7/10, 7/10)
+
+############################# TESTS ON OVERLAPPING MENTIONS ##############################
+
+def test_OLMA1():
+  doc = read('overlapping_mentions/TC-OLMA.key', 'overlapping_mentions/TC-OLMA-1.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_OLMA2():
+  doc = read('overlapping_mentions/TC-OLMA.key', 'overlapping_mentions/TC-OLMA-2.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_OLMA3():
+  doc = read('overlapping_mentions/TC-OLMA.key', 'overlapping_mentions/TC-OLMA-3.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_OLMA4():
+  doc = read('overlapping_mentions/TC-OLMA.key', 'overlapping_mentions/TC-OLMA-4.response')
+  assert evaluate(doc, muc) == (3/4, 3/4, 3/4)
+  assert evaluate(doc, b_cubed) == (17/24, 17/24, 17/24)
+
+def test_OLMA5():
+  doc = read('overlapping_mentions/TC-OLMA.key', 'overlapping_mentions/TC-OLMA-5.response')
+  assert evaluate(doc, muc) == (3/4, 3/3, 6/7)
+  assert evaluate(doc, b_cubed) == (17/24, 5/5, 34/41)
+
+def test_OLMA6():
+  doc = read('overlapping_mentions/TC-OLMA.key', 'overlapping_mentions/TC-OLMA-6.response')
+  assert evaluate(doc, muc) == approx([1/2, 2/3, 4/7], abs=TOL)
+  assert evaluate(doc, b_cubed) == (11/24, 7/10, 77/139)
+
+def test_OLMB1():
+  doc = read('overlapping_mentions/TC-OLMB.key', 'overlapping_mentions/TC-OLMB-1.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_OLMB2():
+  doc = read('overlapping_mentions/TC-OLMB.key', 'overlapping_mentions/TC-OLMB-2.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_OLMB3():
+  doc = read('overlapping_mentions/TC-OLMB.key', 'overlapping_mentions/TC-OLMB-3.response')
+  assert evaluate(doc, muc) == (3/4, 3/4, 3/4)
+  assert evaluate(doc, b_cubed) == approx([3/4, 5/6, 15/19], abs=TOL)
+
+def test_OLMB4():
+  doc = read('overlapping_mentions/TC-OLMB.key', 'overlapping_mentions/TC-OLMB-4.response')
+  assert evaluate(doc, muc) == (3/4, 3/4, 3/4)
+  assert evaluate(doc, b_cubed) == (17/24, 17/24, 17/24)
+
+def test_OLMB5():
+  doc = read('overlapping_mentions/TC-OLMB.key', 'overlapping_mentions/TC-OLMB-5.response')
+  assert evaluate(doc, muc) == (3/4, 3/3, 6/7)
+  assert evaluate(doc, b_cubed) == (17/24, 5/5, 34/41)
+
+def test_OLMB6():
+  doc = read('overlapping_mentions/TC-OLMB.key', 'overlapping_mentions/TC-OLMB-6.response')
+  assert evaluate(doc, muc) == approx([1/2, 2/3, 4/7], abs=TOL)
+  assert evaluate(doc, b_cubed) == (11/24, 7/10, 77/139)
+
+def test_OLMC1():
+  doc = read('overlapping_mentions/TC-OLMC.key', 'overlapping_mentions/TC-OLMC-1.response')
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_OLMC2():
+  doc = read('overlapping_mentions/TC-OLMC.key', 'overlapping_mentions/TC-OLMC-2.response')
+  assert evaluate(doc, muc) == approx([3/4, 2/3, 12/17], abs=TOL)
+  assert evaluate(doc, b_cubed) == approx([3/4, 4/5, 24/31], abs=TOL)
+
+def test_OLMC3():
+  doc = read('overlapping_mentions/TC-OLMC.key', 'overlapping_mentions/TC-OLMC-3.response')
+  assert evaluate(doc, muc) == approx([3/4, 1, 6/7], abs=TOL)
+  assert evaluate(doc, b_cubed) == approx([17/24, 1, 34/41], abs=TOL)
+
+def test_OLMC4():
+  doc = read('overlapping_mentions/TC-OLMC.key', 'overlapping_mentions/TC-OLMC-4.response')
+  assert evaluate(doc, muc) == approx([1, 1, 1], abs=TOL)
+  assert evaluate(doc, b_cubed) == approx([1, 1, 1], abs=TOL)
+
