@@ -498,3 +498,24 @@ def test_OLMC4():
   assert evaluate(doc, muc) == approx([1, 1, 1], abs=TOL)
   assert evaluate(doc, b_cubed) == approx([1, 1, 1], abs=TOL)
 
+def test_OLMC5():
+  doc = read('overlapping_mentions/TC-OLMC.key', 'overlapping_mentions/TC-OLMC-5.response')
+  assert evaluate(doc, muc) == approx([1, 1, 1], abs=TOL)
+  assert evaluate(doc, b_cubed) == approx([1, 1, 1], abs=TOL)
+  assert evaluate(doc, ceafe) == (38/45, 38/45, 38/45)
+  assert evaluate(doc, ceafm) == (1, 3/4, 6/7)
+
+def test_OLMC6():
+  doc = read('overlapping_mentions/TC-OLMC.key', 'overlapping_mentions/TC-OLMC-6.response')
+  assert evaluate(doc, muc) == approx([1, 2/3, 4/5], abs=TOL)
+  assert evaluate(doc, b_cubed) == approx([1, 71/120, 142/191], abs=TOL)
+  assert evaluate(doc, ceafe) == (38/45, 38/45, 38/45)
+  assert evaluate(doc, ceafm) == (1, 3/4, 6/7)
+
+def test_OLMC7():
+  doc = read('overlapping_mentions/TC-OLMC.key', 'overlapping_mentions/TC-OLMC-7.response')
+  assert evaluate(doc, muc) == approx([1, 3/4, 6/7], abs=TOL)
+  assert evaluate(doc, b_cubed) == approx([1, 79/120, 158/199], abs=TOL)
+  assert evaluate(doc, ceafe) == approx([11/15, 11/15, 11/15], abs=TOL)
+  assert evaluate(doc, ceafm) == approx([1, 3/5, 3/4], abs=TOL)
+
