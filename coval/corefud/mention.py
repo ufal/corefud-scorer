@@ -37,36 +37,42 @@ class MentionDict:
 
     def _fuzzy_find(self, qm):
         """Given a query mention `qm`, retrieve a mention out of the key mentions `km` that fuzzilly matches best `qm`.
-        Criteria to match a key mention `km` with `qm`:
+        Candidate key mentions are collected by taking all key mentions that contain any word from `qm`.
+        The candidate key mentions `km`s are subsequently filtered using the following criteria:
         1. `km` must be (fuzzilly) equal to `qm`
         2. if more than a single `km` is equal, return the one that overlaps with the query with proportionally smallest difference
         3. if still more than one `km` remain, return the one that starts earlier in the document
         4. if still more than one `km` remain, return the one that ends earlier in the document
         There should not be more than one matching key after the last criterion.
         """
+        # collect candidate mentions as a set of all key mentions that contain any word from the query mention
+        candidate_mentions = set()
         for qw in qm._words:
             if qw in self._word2mention:
-                # the retrieved key mention must be equal to the one in the query
-                equal_mentions = [km for km in self._word2mention[qw] if qm == km]
-                if equal_mentions:
-                    if len(equal_mentions) == 1:
-                        return equal_mentions[0]
-                    # if more than one is equal, retrieve the one that overlaps with the query with proportionally smallest difference
-                    equal_mentions_diff = [len(qm.symmetric_difference(km)) / len(qm.union(km)) for km in equal_mentions]
-                    min_diff = min(equal_mentions_diff)
-                    min_diff_mentions = [km for i, km in enumerate(equal_mentions) if equal_mentions_diff[i] == min_diff]
-                    if len(min_diff_mentions) == 1:
-                        return min_diff_mentions[0]
-                    # if still more than one mention fit, retrieve the one that starts earlier
-                    min_diff_mentions.sort(key=lambda km: km.words[0])
-                    starts_first_mentions = [km for km in min_diff_mentions if km.words[0] == min_diff_mentions[0].words[0]]
-                    if len(starts_first_mentions) == 1:
-                        return starts_first_mentions[0]
-                    # if still more than one mention fit, retrieve the one that ends earlier
-                    starts_first_mentions.sort(key=lambda km: km.words[-1])
-                    ends_first_mentions = [km for km in starts_first_mentions if km.words[-1] == starts_first_mentions[0].words[-1]]
-                    return ends_first_mentions[0]
-        return None
+                for km in self._word2mention[qw]:
+                    candidate_mentions.add(km)
+
+        # the retrieved key mention must be equal to the one in the query
+        equal_mentions = [km for km in candidate_mentions if qm == km]
+        if not equal_mentions:
+            return None
+        if len(equal_mentions) == 1:
+            return equal_mentions[0]
+        # if more than one is equal, retrieve the one that overlaps with the query with proportionally smallest difference
+        equal_mentions_diff = [len(qm.symmetric_difference(km)) / len(qm.union(km)) for km in equal_mentions]
+        min_diff = min(equal_mentions_diff)
+        min_diff_mentions = [km for i, km in enumerate(equal_mentions) if equal_mentions_diff[i] == min_diff]
+        if len(min_diff_mentions) == 1:
+            return min_diff_mentions[0]
+        # if still more than one mention fit, retrieve the one that starts earlier
+        min_diff_mentions.sort(key=lambda km: km.words[0])
+        starts_first_mentions = [km for km in min_diff_mentions if km.words[0] == min_diff_mentions[0].words[0]]
+        if len(starts_first_mentions) == 1:
+            return starts_first_mentions[0]
+        # if still more than one mention fit, retrieve the one that ends earlier
+        starts_first_mentions.sort(key=lambda km: km.words[-1])
+        ends_first_mentions = [km for km in starts_first_mentions if km.words[-1] == starts_first_mentions[0].words[-1]]
+        return ends_first_mentions[0]
 
     def __contains__(self, m1):
         if isinstance(m1, Mention):
