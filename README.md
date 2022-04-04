@@ -20,13 +20,13 @@ For the time being, the scorer is able to evaluate coreference only, excluding s
 
 Scorer can be run with the following command:
 
-`python corefud-scorer.py` \[OPTIONS...\] \[key\] \[system\]`
+`python corefud-scorer.py [OPTIONS...] [key] [system]`
 
 where `key` and `system` are the location of the key (gold) and system (predicted) files.
 
 Options:
 
-- `-m, --metrics METRIC[ METRIC]\*`: select specific metrics to be evaluated; default: `all`; possible values: `[muc|bcub|ceafe|ceafm|blanc|lea|all]`
+- `-m, --metrics METRIC[ METRIC]*`: select specific metrics to be evaluated; default: `all`; possible values: `[muc|bcub|ceafe|ceafm|blanc|lea|all]`
 - `-s, --keep-singletons`: evaluate also singletons; otherwise any singletons in the key or system files are ignored
 - `-x, --exact-match`: mentions in the key and sys files are matched only if they are exactly the same; otherwise the partial match is applied
 
