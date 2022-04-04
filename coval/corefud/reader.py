@@ -99,6 +99,9 @@ def get_mention_assignments(clusters):
     mention_cluster_ids = {}
     for cluster_id, cluster in enumerate(clusters):
         for m in cluster:
+            if m in mention_cluster_ids:
+                logging.warning("Mention span {:s} has been already indexed with cluster_id = {:d}. New cluster_id = {:d}".format(
+                    str(m), mention_cluster_ids[m], cluster_id))
             mention_cluster_ids[m] = cluster_id
     return MentionDict(mention_cluster_ids)
 
