@@ -8,7 +8,7 @@ __author__ = 'michnov'
 def main():
     argparser = argparse.ArgumentParser(description="Coreference scorer for documents in CorefUD 1.0 scheme")
     argparser.add_argument('key_file', type=str, help='path to the key/reference file')
-
+    argparser.add_argument('sys_file', type=str, help='path to the system/response file')
     argparser.add_argument('-m', '--metrics', choices=['all', 'lea', 'muc', 'bcub', 'ceafe', 'ceafm', 'blanc'], nargs='*', default='all', help='metrics to be used for evaluation')
     argparser.add_argument('-s', '--keep-singletons', action='store_true', default=False, help='evaluate also singletons; ignored otherwise')
     argparser.add_argument('-x', '--exact-match', action='store_true', default=False, help='use exact match for matching key and system mentions; partial match otherwise')
