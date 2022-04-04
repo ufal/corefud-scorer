@@ -1,10 +1,13 @@
 import sys
+import argparse
 from coval.eval import evaluator
 from coval.corefud import reader
 
 __author__ = 'michnov'
 
 def main():
+    argparser = argparse.ArgumentParser(description="Coreference scorer for documents in CorefUD 1.0 scheme")
+    argparser.add_argument()
     metric_dict = {
         'lea': evaluator.lea, 'muc': evaluator.muc,
         'bcub': evaluator.b_cubed, 'ceafe': evaluator.ceafe,
