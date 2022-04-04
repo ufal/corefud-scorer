@@ -1,50 +1,38 @@
 import sys
+import argparse
 from coval.eval import evaluator
 from coval.corefud import reader
 
 __author__ = 'michnov'
 
 def main():
+    argparser = argparse.ArgumentParser(description="Coreference scorer for documents in CorefUD 1.0 scheme")
+    argparser.add_argument('key_file', type=str, help='path to the key/reference file')
+
+    argparser.add_argument('-m', '--metrics', choices=['all', 'lea', 'muc', 'bcub', 'ceafe', 'ceafm', 'blanc'], nargs='*', default='all', help='metrics to be used for evaluation')
+    argparser.add_argument('-s', '--keep-singletons', action='store_true', default=False, help='evaluate also singletons; ignored otherwise')
+    argparser.add_argument('-x', '--exact-match', action='store_true', default=False, help='use exact match for matching key and system mentions; partial match otherwise')
+    args = argparser.parse_args()
+    
     metric_dict = {
         'lea': evaluator.lea, 'muc': evaluator.muc,
         'bcub': evaluator.b_cubed, 'ceafe': evaluator.ceafe,
-        'ceafm':evaluator.ceafm, 'blanc':[evaluator.blancc,evaluator.blancn]}
-    key_file = sys.argv[1]
-    sys_file = sys.argv[2]
+        'ceafm': evaluator.ceafm, 'blanc': [evaluator.blancc,evaluator.blancn]}
   
-    if 'keep_singletons' in sys.argv or 'keep_singleton' in sys.argv:
-        keep_singletons = True
-    else:
-        keep_singletons = False
+    if 'all' in args.metrics:
+        args.metrics = metric_dict.keys()
+    args.metrics = [(name, metric_dict[name]) for name in args.metrics]
 
-    if 'exact_matching' in sys.argv or 'exact_match' in sys.argv:
-        exact_matching = True
-    else:
-        exact_matching = False
-  
-    if 'all' in sys.argv:
-        metrics = [(k, metric_dict[k]) for k in metric_dict]
-    else:
-        metrics = []
-        for name in metric_dict:
-            if name in sys.argv:
-                metrics.append((name, metric_dict[name]))
+    msg = 'The scorer is evaluating coreference {:s} singletons, with {:s} matching of mentions using the following metrics: {:s}.'.format(
+        'including' if args.keep_singletons else 'excluding',
+        'exact' if args.exact_match else 'partial',
+        ", ".join([name for name, f in args.metrics]))
+    print(msg)
 
-    if len(metrics) == 0:
-        metrics = [(name, metric_dict[name]) for name in metric_dict]
-  
-    msg = ""
-    msg = 'coreferent markables'
-    if keep_singletons:
-        msg+= ', singletons'
-  
-    print('The scorer is evaluating ', msg)
-
-    evaluate(key_file, sys_file, metrics, exact_matching, keep_singletons)
+    evaluate(args.key_file, args.sys_file, args.metrics, args.exact_match, args.keep_singletons)
 
 def evaluate(key_file, sys_file, metrics, exact_matching, keep_singletons):
 
-    # TODO: extract clusters
     coref_infos = reader.get_coref_infos(key_file, sys_file, exact_matching, keep_singletons)
     
     conll = 0
