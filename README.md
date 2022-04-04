@@ -37,12 +37,22 @@ By default, the CorefUD scorer calculates all evaluation metrics using partial m
 ### Evaluation Metrics
 
 Evaluation using any of the following metrics is supported:
-- `The above command reports MUC [Vilain et al, 1995], B-cubed [Bagga and Baldwin, 1998], CEAF [Luo et al., 2005], BLANC [Recasens and Hovy, 2011], LEA [Moosavi and Strube, 2016] and the averaged CoNLL score (the average of the F1 values of MUC, B-cubed and CEAFe) [Denis and Baldridge, 2009a; Pradhan et al., 2014].
+- MUC [Vilain et al, 1995]
+- B-cubed [Bagga and Baldwin, 1998]
+- CEAF in the entity (CEAFe) and mention (CEAFm) variant [Luo et al., 2005]
+- BLANC [Recasens and Hovy, 2011]
+- LEA [Moosavi and Strube, 2016]
+- the averaged CoNLL score (the average of the F1 values of MUC, B-cubed and CEAFe) [Denis and Baldridge, 2009a; Pradhan et al., 2014].
 
 You can also only select specific metrics by including one or some of the `muc`, `bcub`, `ceafe`, `ceafm`, `blanc` and `lea` options in the input arguments.
+CoNLL score is reported automatically if all MUC, B-cubed and CEAFe are calculated.
 For instance, the following command only reports the CEAFe and LEA scores:
 
-`python ua-scorer.py key system ceafe lea`
+`python corefud-scorer.py -m ceafe lea -- key sys`
 
-The first and second arguments after `ua-scorer.py` have to be 'key' and 'system', respectively. The order of the other options is arbitrary.
+The symbol `--` needs to be used to delimit the two required positional arguments (`key` and `sys`) from a list of metrics to be calculated.
+Alternatively, potentially unlimited list of metrics may be passed as the last argument:
 
+`python corefud-scorer.py key sys -m ceafe lea`
+
+### TODO
