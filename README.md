@@ -22,10 +22,12 @@ CorefUD scorer uses API for working with the CorefUD 1.0 format, which is implem
 However, the version of the framework this scorer requires is not yet available on PyPI.
 Udapi thus must be installed in the mode for developers (see the [instructions](https://github.com/udapi/udapi-python#install-udapi-for-developers)).
 In order to guarantee that the scorer works properly, checkout the following commit of the Udapi repository:
-```git checkout f1a1d53```
+
+`git checkout f1a1d53`
 
 Install remaining dependencies in a standard way by running Pip3:
-```pip3 install -r requirements.txt```
+
+`pip3 install -r requirements.txt`
 
 ## Usage
 
