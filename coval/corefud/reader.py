@@ -1,5 +1,6 @@
 import logging
-import udapi
+from udapi.core.document import Document
+from udapi.block.read.conllu import Conllu
 from collections import defaultdict, OrderedDict
 from coval.corefud.mention import Mention, MentionDict
 
@@ -21,6 +22,12 @@ class CorefFormatError(BaseException):
 
     def __str__(self):
         return message
+
+def load_conllu(file_path):
+    doc = Document()
+    conllu_reader = Conllu(files=[file_path])
+    conllu_reader.apply_on_document(doc)
+    return doc
 
 def check_data_alignment(data1, data2):
     data12_trees = zip(data1.trees, data2.trees)
@@ -104,8 +111,8 @@ def get_coref_infos(key_file,
         keep_singletons=True):
 
     # loading the documents
-    key_data = udapi.Document(key_file)
-    sys_data = udapi.Document(sys_file)
+    key_data = load_conllu(key_file)
+    sys_data = load_conllu(sys_file)
 
     # checking if key and sys data are aligned
     check_data_alignment(key_data, sys_data)
