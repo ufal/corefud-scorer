@@ -1,8 +1,7 @@
 import logging
+import udapi
 from collections import defaultdict, OrderedDict
 from coval.corefud.mention import Mention, MentionDict
-from udapi.core.document import Document
-from udapi.block.read.conllu import Conllu
 
 class DataAlignError(BaseException):
     def __init__(self, key_node, sys_node, misalign_source="Words"):
@@ -22,12 +21,6 @@ class CorefFormatError(BaseException):
 
     def __str__(self):
         return message
-
-def load_conllu(file_path):
-    doc = Document()
-    conllu_reader = Conllu(files=[file_path])
-    conllu_reader.apply_on_document(doc)
-    return doc
 
 def check_data_alignment(data1, data2):
     data12_trees = zip(data1.trees, data2.trees)
@@ -53,7 +46,7 @@ def split_data_to_docs(data):
             word2docid[node] = docid
     doc_clusters = defaultdict(lambda: defaultdict(list))
 
-    for cid, cluster in data.coref_clusters.items():
+    for cluster in data.coref_entities:
         mention_doc = None
         for mention in cluster.mentions:
             words_docs = list(set([word2docid[w] for w in mention.words]))
@@ -61,9 +54,9 @@ def split_data_to_docs(data):
                 mention_str = ", ".join([str(w) for w in mention.words])
                 raise CorefFormatError("Mention cannot cross a document boundary. The following does: " + mention_str)
             if mention_doc and mention_doc != words_docs[0]:
-                logging.warning("Cluster {:s} spans two documents ({:s}, {:s}). It will be split.".format(cid, mention_doc, words_docs[0]))
+                logging.warning(f"Cluster {cluster.eid} spans two documents ({mention_doc}, {words_docs[0]}). It will be split.")
             mention_doc = words_docs[0]
-            doc_clusters[mention_doc][cid].append(mention)
+            doc_clusters[mention_doc][cluster.eid].append(mention)
     return doc_clusters
 
 def transform_clusters_for_eval(clusters, nohead=False):
@@ -111,8 +104,8 @@ def get_coref_infos(key_file,
         keep_singletons=True):
 
     # loading the documents
-    key_data = load_conllu(key_file)
-    sys_data = load_conllu(sys_file)
+    key_data = udapi.Document(key_file)
+    sys_data = udapi.Document(sys_file)
 
     # checking if key and sys data are aligned
     check_data_alignment(key_data, sys_data)

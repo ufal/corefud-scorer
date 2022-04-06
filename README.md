@@ -18,14 +18,8 @@ For the time being, the scorer is able to evaluate coreference only, excluding s
 
 ## Installation
 
-CorefUD scorer uses API for working with the CorefUD 1.0 format, which is implemented in the Udapi framework.
-However, the version of the framework this scorer requires is not yet available on PyPI.
-Udapi thus must be installed in the mode for developers (see the [instructions](https://github.com/udapi/udapi-python#install-udapi-for-developers)).
-In order to guarantee that the scorer works properly, checkout the following commit of the Udapi repository:
-
-`git checkout f1a1d53`
-
-Install remaining dependencies in a standard way by running Pip3:
+CorefUD scorer uses [Udapi](https://github.com/udapi/udapi-python) (>=0.3.0) for working with the CorefUD 1.0 format.
+You can install it from PyPI together with the remaining dependencies in a standard way by running Pip3:
 
 `pip3 install -r requirements.txt`
 
