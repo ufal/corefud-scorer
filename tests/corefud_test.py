@@ -9,7 +9,7 @@ TOL = 1e-4
 
 
 def read(key, response, exact_match=False):
-  return get_coref_infos('%s' % key, '%s' % response, exact_match, True)
+  return get_coref_infos('tests/%s' % key, 'tests/%s' % response, exact_match, True)
 
 def test_A1():
   doc = read('TC-A.key', 'TC-A-1.response', exact_match=True)

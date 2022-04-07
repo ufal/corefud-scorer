@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 
-CONLL_TEST_DIR=../tests
+CONLL_TEST_DIR=../conll12_tests
 
 # converting CoNLL 2012 unit tests to the CorefUD 1.0 format
 # in the original CoNLL 2012 unit tests, there are no heads or min-spans labeled
@@ -19,5 +19,5 @@ convert_tests:
 		python convert_test_files.py < $$f > $$file;\
 	done
 
-corefud_test :
-	pytest corefud-unittests.py
+test :
+	(cd ..; pytest)
