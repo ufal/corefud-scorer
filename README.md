@@ -29,7 +29,7 @@ Scorer can be run with the following command:
 
 `python corefud-scorer.py [OPTIONS...] [key] [system]`
 
-where `key` and `system` are the location of the key (gold) and system (predicted) files.
+where `key` and `system` are the location of the key/reference and system/response files.
 
 Options:
 
@@ -37,9 +37,27 @@ Options:
 - `-s, --keep-singletons`: evaluate also singletons; otherwise any singletons in the key or system files are ignored
 - `-x, --exact-match`: mentions in the key and sys files are matched only if they are exactly the same; otherwise the partial match is applied
 
-## Details on Evaluation Metrics and Evaluation Modes
+## Details
 
 By default, the CorefUD scorer calculates all evaluation metrics using partial match and ignoring all singletons.
+
+### <a name="input_files"></a>Input Files
+
+Both the key and system files must be [well-formed CoNLL-U files](https://universaldependencies.org/format.html) with the coreference information stored in the `MISC` field.
+The coreference information must be formatted in the [CorefUD 1.0 style](TODO).
+(WARNING: It completely differs from the format used in CorefUD 0.\*).
+
+The scorer does not check most of the morpho-syntactic features required by the CoNLL-U format.
+For most fields, `_` symbol may be used instead of the true values, `0` value for the `HEAD` field.
+
+However, the two input files must be aligned.
+Otherwise, the evaluation fails.
+Specifically, the evaluation scripts checks if the following requirements are fulfilled:
+1. both files must contain the same number of sentences with exactly the same IDs (`# sent_id`);
+2. each pair of sentences must contain the same words/tokens, i.e. both their count and forms (the `FORM` field) must be the same;
+3. document separators (`# newdoc`) must be exactly at the same places.
+
+The easiest way to satisfy all the requirements above is to ensure that the key and response files differ only in the coreference annotation in the `MISC` field.
 
 ### Evaluation Metrics
 
@@ -51,7 +69,7 @@ Evaluation using any of the following metrics is supported:
 - LEA [Moosavi and Strube, 2016]
 - the averaged CoNLL score (the average of the F1 values of MUC, B-cubed and CEAFe) [Denis and Baldridge, 2009a; Pradhan et al., 2014].
 
-You can also only select specific metrics by including one or some of the `muc`, `bcub`, `ceafe`, `ceafm`, `blanc` and `lea` options in the input arguments.
+You can also select only specific metrics by including one or some of the `muc`, `bcub`, `ceafe`, `ceafm`, `blanc` and `lea` values as parameters of the option `-m, --metrics`.
 CoNLL score is reported automatically if all MUC, B-cubed and CEAFe are calculated.
 For instance, the following command only reports the CEAFe and LEA scores:
 
@@ -62,7 +80,52 @@ Alternatively, potentially unlimited list of metrics may be passed as the last a
 
 `python corefud-scorer.py key sys -m ceafe lea`
 
-### TODO
+### Mention matching
+
+A fundamental element of all the metrics above are whether there is a correspondence between a key mention and a response mention.
+In other words, if the two mentions, each from one of the two input files, are matching or aligned.
+CorefUD scorer distinguishes between two types of mention matching:
+1. exact
+2. partial/fuzzy
+This can be controlled by the `-x, --exact-match` option, which enables exact matching.
+Otherwise, mentions are compared with partial matching.
+
+In *exact matching*, the two mentions are considered matching if and only if they consist of the same set of words.
+A word is defined here only by its position within the sentence and by position of the sentence within the whole file, which is sufficient as one-to-one alignment of word forms has been already ensured by passing the file alignment requirements specified [above](#input_files).
+
+In *partial matching*, the two mentions are considered matching if and only if the key mention contains all words from the response mention and a key mention head is included among the response mention words at the same time.
+As the mentions within a document may be embedded or even crossing, a mention *m* from one file may potentially match more than a single mention *n* from the other file.
+To end up with a single matched mention, the following rules are obeyed:
+1. pick the mention that overlaps with *m* with proportionally smallest difference
+2. if still more than one *n* remain, pick the one that starts earlier in the document
+3. if still more than one *n* remain, pick the one that ends earlier in the document
+
+Data that follow the CorefUD 1.0 format are required to have all mentions labeled with a mention head, which is one of the mention words that syntactically (but often also semantically) governs the whole mention.
+Mention heads in CorefUD 1.0 data have been selected by [heuristics](https://github.com/udapi/udapi-python/blob/master/udapi/block/corefud/movehead.py) based on the dependency structure of the sentence the mention belongs to.
+For example, the word `experience` is annotated as a head of the mention `the viewing experience of art` in the following:
+```
+1   The        ...   Entity=(e27-abstract-3-
+2   viewing    ...   Entity=(e28-event-1-)
+3   experience ...   _
+4   of         ...   _
+5   art        ...   Entity=(e20-abstract-1-)e27)
+6   is         ...   _
+...
+```
+
+The only information on mentions from the response file that scorer takes into account are the position of the words that the mention consists of.
+Unlike key mentions heads, the heads in response mentions are ignored in mention matching.
+
+
+CorefUD scorer allows for evaluating discontinuous mentions in any of the input files.
+
+
+### Singletons
+
+
+
+
+### Authors
 
 ### References
   
