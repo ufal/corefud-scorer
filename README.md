@@ -12,7 +12,7 @@ The scorer builds on the following projects:
 
 Unlike any of the previous scorers, CorefUD scorer is adjusted to process and correctly evaluate also non-contiguous mentions.
 
-It supports both exact match and partial match of mentions. Partial match is an alternative to minimum span evaluation by the UA scorer. In addtion, the evaluation can be run with singletons taken into account.
+It supports both exact match and partial match of mentions. Partial match is an alternative to minimum span evaluation by the UA scorer. In addition, the evaluation can be run with singletons taken into account.
 
 For the time being, the scorer is able to evaluate coreference only, excluding split antecedents, bridging and other relations.
 
