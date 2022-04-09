@@ -80,18 +80,23 @@ Alternatively, potentially unlimited list of metrics may be passed as the last a
 
 `python corefud-scorer.py key sys -m ceafe lea`
 
-### Mention matching
+### Mention Matching
 
-A fundamental element of all the metrics above are whether there is a correspondence between a key mention and a response mention.
-In other words, if the two mentions, each from one of the two input files, are matching or aligned.
+A fundamental element of all the metrics above is whether there is a correspondence between a key mention and a response mention.
+In other words, if the two mentions, each from one of the two input files, are matching.
 CorefUD scorer distinguishes between two types of mention matching:
 1. exact
 2. partial/fuzzy
-This can be controlled by the `-x, --exact-match` option, which enables exact matching.
+This can be controlled by the `-x, --exact-match` option, which switches on exact matching.
 Otherwise, mentions are compared with partial matching.
 
+#### Exact Matching
+
 In *exact matching*, the two mentions are considered matching if and only if they consist of the same set of words.
-A word is defined here only by its position within the sentence and by position of the sentence within the whole file, which is sufficient as one-to-one alignment of word forms has been already ensured by passing the file alignment requirements specified [above](#input_files).
+A word is defined here only by its position within the sentence and by position of the sentence within the whole file.
+This is sufficient as one-to-one alignment of word forms has been already ensured by passing the file alignment requirements specified [above](#input_files).
+
+#### Partial Matching
 
 In *partial matching*, the two mentions are considered matching if and only if the key mention contains all words from the response mention and a key mention head is included among the response mention words at the same time.
 As the mentions within a document may be embedded or even crossing, a mention *m* from one file may potentially match more than a single mention *n* from the other file.
@@ -100,9 +105,10 @@ To end up with a single matched mention, the following rules are obeyed:
 2. if still more than one *n* remain, pick the one that starts earlier in the document
 3. if still more than one *n* remain, pick the one that ends earlier in the document
 
-Data that follow the CorefUD 1.0 format are required to have all mentions labeled with a mention head, which is one of the mention words that syntactically (but often also semantically) governs the whole mention.
+Data that comply with the CorefUD 1.0 format are required to have all mentions labeled with a mention head, which is one of the mention words that syntactically (but often also semantically) governs the whole mention.
+(WARNING: Do not confuse with the `HEAD` field in the CoNLL-U format, which marks a dependency parent of current node)
 Mention heads in CorefUD 1.0 data have been selected by [heuristics](https://github.com/udapi/udapi-python/blob/master/udapi/block/corefud/movehead.py) based on the dependency structure of the sentence the mention belongs to.
-For example, the word `experience` is annotated as a head of the mention `the viewing experience of art` in the following:
+In the following example, the 3rd word of the mention `the viewing experience of art`, i.e. the word `experience`, is labeled as the mention head:
 ```
 1   The        ...   Entity=(e27-abstract-3-
 2   viewing    ...   Entity=(e28-event-1-)
@@ -113,19 +119,44 @@ For example, the word `experience` is annotated as a head of the mention `the vi
 ...
 ```
 
-The only information on mentions from the response file that scorer takes into account are the position of the words that the mention consists of.
-Unlike key mentions heads, the heads in response mentions are ignored in mention matching.
+Each key mention is represented by all its words and its head, where the `--exact-match` option determines if the head is going to be taken into account or not.
+On the other hand, the only information on response mentions the scorer keeps are the words that the mention consists of.
+Even though marking mention head index in CorefUD 1.0 format is mandatory, unlike in the case of key mentions, heads of response mentions are simply ignored during evaluation.
+A coreference resolution system producing response mentions can thus set each mention head index to value `1`, setting the first word of a mention as its head.
 
+#### Discontinuous mentions
 
 CorefUD scorer allows for evaluating discontinuous mentions in any of the input files.
-
+This is why mention matching is based on set-subset relations between sets of words in mentions, instead of comparing positions of mention starts and ends, which is usual in previous scorers, e.g. in CoNLL 2012 scorer and UA scorer.
 
 ### Singletons
 
+Singletons are entities that contain only a single mention.
+Datasets often differ in the aspect whether singletons have been annotated or not.
+And this does not have to be in line with a coreference resolution system.
 
-
+In order to ensure fair comparison, all singletons are excluded from both key and response files.
+Nevertheless, evaluation with singletons included may be turned on by the `-s, --keep-singletons` option.
 
 ### Authors
+
+* Michal Novák, Charles University, Prague, Czech Republic, mnovak@ufal.mff.cuni.cz
+* Yilun Zhu, Georgetown University, Washington D.C., USA, yz565@georgetown.edu
+* Martin Popel, Charles University, Prague, Czech Republic, popel@ufal.mff.cuni.cz
+
+The Universal Anaphora scorer has been developed by:
+
+* Juntao Yu, Queen Mary University of London, juntao.cn@gmail.com
+* Nafise Moosavi, UKP, TU Darmstadt, ns.moosavi@gmail.com
+* Silviu Paun, Queen Mary University of London, spaun3691@gmail.com
+* Massimo Poesio, Queen Mary University of London, poesio@gmail.com
+
+The original reference Coreference Scorer (CoNLL 2012 scorer) was developed by:
+
+*  Emili Sapena, Universitat Politècnica de Catalunya, http://www.lsi.upc.edu/~esapena, esapena@lsi.upc.edu
+*  Sameer Pradhan, https://cemantix.org, pradhan@cemantix.org
+*  Sebastian Martschat, sebastian.martschat@h-its.org
+*  Xiaoqiang Luo, xql@google.com
 
 ### References
   
