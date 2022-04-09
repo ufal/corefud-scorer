@@ -6,9 +6,9 @@ CorefUD scorer is a scorer for coreference and anaphoric relations that are harm
 
 The scorer builds on the following projects:
 
-- original Coreference scorer [Pradhan et al, 2014] developed for scoring the CoNLL 2011 and 2012 shared tasks using the OntoNotes corpus [Pradhan et al, 2011; Pradhan et al, 2012]: https://github.com/conll/reference-coreference-scorers
-- its reimplementation in Python by Moosavi, also extended to compute the LEA score [Moosavi and Strube, 2016] and to evaluate non-referring expressions evaluation and cover singletons [Poesio et al, 2018]: https://github.com/ns-moosavi/LEA-coreference-scorer
-- Universal Anaphora scorer, which is an adaptation of the previous two scorers to the Universal Anaphora guidelines mostly implemented by Juntao Yu [Khosla et al, 2021], extended to evaluate also bridging, discourse deixis and split antecedents: https://github.com/juntaoy/universal-anaphora-scorer
+- [original Coreference scorer](https://github.com/conll/reference-coreference-scorers) [Pradhan et al, 2014] developed for scoring the CoNLL 2011 and 2012 shared tasks using the OntoNotes corpus [Pradhan et al, 2011; Pradhan et al, 2012],
+- its [reimplementation in Python by Moosavi](https://github.com/ns-moosavi/LEA-coreference-scorer), also extended to compute the LEA score [Moosavi and Strube, 2016] and to evaluate non-referring expressions and cover singletons [Poesio et al, 2018],
+- [Universal Anaphora scorer](https://github.com/juntaoy/universal-anaphora-scorer), which is an adaptation of the previous two scorers to the Universal Anaphora guidelines mostly implemented by Juntao Yu [Khosla et al, 2021], extended to evaluate also bridging, discourse deixis and split antecedents.
 
 Unlike any of the previous scorers, CorefUD scorer is adjusted to process and correctly evaluate also non-contiguous mentions.
 
@@ -19,7 +19,7 @@ For the time being, the scorer is able to evaluate coreference only, excluding s
 ## Installation
 
 CorefUD scorer uses [Udapi](https://github.com/udapi/udapi-python) (>=0.3.0) for working with the CorefUD 1.0 format.
-You can install it from PyPI together with the remaining dependencies in a standard way by running Pip3:
+You can install it from PyPI together with the remaining dependencies in a standard way by running pip:
 
 `pip3 install -r requirements.txt`
 
