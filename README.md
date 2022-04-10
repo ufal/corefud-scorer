@@ -2,7 +2,7 @@
 
 ## About
 
-CorefUD scorer is a scorer for coreference and anaphoric relations that are harmonized under the same scheme defined by the CorefUD 1.0 project.
+CorefUD scorer is a scorer for coreference and anaphoric relations that are harmonized under the same scheme defined by the [CorefUD 1.0](https://ufal.mff.cuni.cz/corefud) project.
 
 The scorer builds on the following projects:
 
@@ -18,7 +18,7 @@ For the time being, the scorer is able to evaluate coreference only, excluding s
 
 ## Installation
 
-CorefUD scorer uses [Udapi](https://github.com/udapi/udapi-python) (>=0.3.0) for working with the CorefUD 1.0 format.
+CorefUD scorer uses [Udapi](https://github.com/udapi/udapi-python) (>=0.3.0) for working with the [CorefUD 1.0 format](https://ufal.mff.cuni.cz/~zeman/2022/docs/corefud-1.0-format.pdf).
 You can install it from PyPI together with the remaining dependencies in a standard way by running pip:
 
 `pip3 install -r requirements.txt`
@@ -44,7 +44,7 @@ By default, the CorefUD scorer calculates all evaluation metrics using partial m
 ### <a name="input_files"></a>Input Files
 
 Both the key and system files must be [well-formed CoNLL-U files](https://universaldependencies.org/format.html) with the coreference information stored in the `MISC` field.
-The coreference information must be formatted in the [CorefUD 1.0 style](TODO).
+The coreference information must be formatted in the [CorefUD 1.0 style](https://ufal.mff.cuni.cz/~zeman/2022/docs/corefud-1.0-format.pdf).
 (WARNING: It completely differs from the format used in CorefUD 0.\*).
 
 The scorer does not check most of the morpho-syntactic features required by the CoNLL-U format.
