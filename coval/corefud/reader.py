@@ -45,13 +45,14 @@ def split_data_to_docs(data):
     word2docid = {}
     docord = 0
     docid = None
+    doc_clusters = defaultdict(list)
     for tree in data.trees:
         if tree.newdoc:
             docord += 1
             docid = tree.newdoc if tree.newdoc is not True else docord
+            doc_clusters[docid] = defaultdict(list)
         for node in tree.descendants_and_empty:
             word2docid[node] = docid
-    doc_clusters = defaultdict(lambda: defaultdict(list))
 
     for cluster in data.coref_entities:
         mention_doc = None
