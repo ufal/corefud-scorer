@@ -136,7 +136,7 @@ class Mention:
             return self.__lt__(other) or self.__eq__(other)
 
         def __str__(self):
-            return "{:d}-{:d}".format(self._sentord, self._wordord)
+            return f"{self._sentord}-{self._wordord}"
 
         def __repr__(self):
             return str(self)
