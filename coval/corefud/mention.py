@@ -157,6 +157,12 @@ class Mention:
     def words(self):
         return self._words
 
+    def __getitem__(self, i):
+        return self._words[i]
+
+    def __len__(self):
+        return len(self._words)
+
     def _exact_match(self, other):
         """Mentions `self` and `other` are matched exactly, if all words the mentions are
         formed by are identical.
@@ -194,6 +200,17 @@ class Mention:
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __lt__(self, other):
+        if isinstance(other, self.__class__):
+            if self._words[0] == other._words[0]:
+                if self._words[-1] == other._words[-1]:
+                    return len(self._words) < len(other._words)
+                else:
+                    return self._words[-1] < other._words[-1]
+            else:
+                return self._words[0] < other._words[0]
+        return NotImplemented
+
     def __hash__(self):
         return hash(frozenset(self._words))
 
@@ -219,6 +236,15 @@ class Mention:
         if isinstance(other, self.__class__):
             return self._wordsset.union(other._wordsset)
         return NotImplemented
+
+    def intersection(self, other):
+        if isinstance(other, self.__class__):
+            if self._words[0] > other._words[-1] or \
+                other._words[0] > self._words[-1]:
+                return []
+            return self._wordsset.intersection(other._wordsset)
+        return NotImplemented
+
 
 ###### UNUSED MENTION MATCHING STRATEGIES #######
 

@@ -176,6 +176,8 @@ class Evaluator:
     elif self.metric == muc:
       pn, pd = self.metric(sys_clusters, key_clusters, sys_mention_key_cluster, sys_split_antecedent_key_p,is_split_alignment)
       rn, rd = self.metric(key_clusters, sys_clusters, key_mention_sys_cluster, key_split_antecedent_sys_r,is_split_alignment)
+    elif self.metric == mention_matching:
+      pn, pd, rn, rd = self.metric(key_clusters, sys_clusters)
     else:
       pn, pd = self.metric(sys_clusters, sys_mention_key_cluster, sys_split_antecedent_key_p)
       rn, rd = self.metric(key_clusters, key_mention_sys_cluster, key_split_antecedent_sys_r)
@@ -255,7 +257,7 @@ def evaluate_documents(doc_coref_infos, metric, beta=1, lea_split_antecedent_imp
     p, r, f, cnt = 0,0,0,0
     for evaluator in evaluators:
       pn,pd,rn,rd = evaluator.get_counts()
-      # print(pn,pd,rn,rd)
+      #print(f"Doc counts: pn={pn}, pd={pd}, rn={rn}, rd={rd}")
       if pd == rd == 0:
         continue
       sp, sr, sf = evaluator.get_split_antecedent_prf() if only_split_antecedent else evaluator.get_prf()
@@ -272,6 +274,8 @@ def evaluate_documents(doc_coref_infos, metric, beta=1, lea_split_antecedent_imp
     for doc_id in doc_coref_infos:
       # print(doc_id)
       evaluator.update(doc_coref_infos[doc_id])
+      #pn,pd,rn,rd = evaluator.get_counts()
+      #print(f"Doc counts: pn={pn}, pd={pd}, rn={rn}, rd={rd}")
     if only_split_antecedent:
       p, r, f = evaluator.get_split_antecedent_prf()
       return r,p,f
@@ -292,6 +296,158 @@ def mentions(clusters, mention_to_gold, split_antecedent_to_gold={}):
   correct = setofmentions & set(mention_to_gold.keys())
   return len(correct), len(setofmentions)
 
+
+def mention_matching(gold_clusters, sys_clusters):
+    all_gold_mentions = sorted([m for c in gold_clusters for m in c])
+    all_sys_mentions = sorted([m for c in sys_clusters for m in c])
+    pn, pd, rn, rd = 0, 0, 0, 0
+    ol_gold_m, ol_gold_s, ol_gold_e = [], None, None
+    ol_sys_m, ol_gold_s, ol_gold_e = [], None, None
+    curr_gold_mention = None
+    curr_sys_mention = None
+    while all_gold_mentions and all_sys_mentions:
+        if curr_gold_mention is None:
+            curr_gold_mention = all_gold_mentions.pop(0)
+        if curr_sys_mention is None:
+            curr_sys_mention = all_sys_mentions.pop(0)
+
+        #print("--- START ---")
+        #print(f"gold: {curr_gold_mention}")
+        #print(f"sys: {curr_sys_mention}")
+
+        if ol_gold_m or ol_sys_m:
+            if ol_gold_e >= curr_sys_mention[0]:
+                ol_sys_m.append(curr_sys_mention)
+                ol_sys_e = max(ol_sys_e, curr_sys_mention[-1])
+                #print(f"gold group overlaps with sys mention, new sys group: ({ol_sys_s} to {ol_sys_e})")
+                curr_sys_mention = None
+                continue
+            elif ol_sys_e >= curr_gold_mention[0]:
+                ol_gold_m.append(curr_gold_mention)
+                ol_gold_e = max(ol_gold_e, curr_gold_mention[-1])
+                #print(f"sys group overlaps with gold mention, new gold group: ({ol_gold_s} to {ol_gold_e})")
+                curr_gold_mention = None
+                continue
+            else:
+                #print("counting overlapping groups")
+                olpn, olpd, olrn, olrd = _count_overlapping_mentions(ol_gold_m, ol_sys_m)
+                pn += olpn
+                pd += olpd
+                rn += olrn
+                rd += olrd
+                ol_gold_m, ol_gold_s, ol_gold_e = [], None, None
+                ol_sys_m, ol_sys_s, ol_sys_e = [], None, None
+
+        if curr_gold_mention[-1] < curr_sys_mention[0]:
+            #print("sys after gold")
+            rd += len(curr_gold_mention)
+            curr_gold_mention = None
+        elif curr_gold_mention[0] > curr_sys_mention[-1]:
+            #print("gold after sys")
+            pd += len(curr_sys_mention)
+            curr_sys_mention = None
+        else:
+            ol_gold_m.append(curr_gold_mention)
+            ol_gold_s, ol_gold_e = curr_gold_mention[0], curr_gold_mention[-1]
+            ol_sys_m.append(curr_sys_mention)
+            ol_sys_s, ol_sys_e = curr_sys_mention[0], curr_sys_mention[-1]
+            curr_gold_mention, curr_sys_mention = None, None
+            #print(f"gold and sys groups: ({ol_gold_s} to {ol_gold_e}) and ({ol_sys_s} to {ol_sys_e})")
+
+        #print(f"pn={pn}, pd={pd}, rn={rn}, rd={rd}")
+
+    while all_gold_mentions:
+        if curr_gold_mention is None:
+            curr_gold_mention = all_gold_mentions.pop(0)
+        if ol_gold_m or ol_sys_m:
+            if ol_sys_e >= curr_gold_mention[0]:
+                ol_gold_m.append(curr_gold_mention)
+                ol_gold_e = max(ol_gold_e, curr_gold_mention[-1])
+                #print(f"sys group overlaps with gold mention, new gold group: ({ol_gold_s} to {ol_gold_e})")
+                curr_gold_mention = None
+                continue
+            else:
+                #print("counting overlapping groups")
+                olpn, olpd, olrn, olrd = _count_overlapping_mentions(ol_gold_m, ol_sys_m)
+                pn += olpn
+                pd += olpd
+                rn += olrn
+                rd += olrd
+                ol_gold_m, ol_gold_s, ol_gold_e = [], None, None
+                ol_sys_m, ol_sys_s, ol_sys_e = [], None, None
+        rd += len(curr_gold_mention)
+        curr_gold_mention = None
+
+    while all_sys_mentions:
+        if curr_sys_mention is None:
+            curr_sys_mention = all_sys_mentions.pop(0)
+        if ol_gold_m or ol_sys_m:
+            if ol_gold_e >= curr_sys_mention[0]:
+                ol_sys_m.append(curr_sys_mention)
+                ol_sys_e = max(ol_sys_e, curr_sys_mention[-1])
+                #print(f"gold group overlaps with sys mention, new sys group: ({ol_sys_s} to {ol_sys_e})")
+                curr_sys_mention = None
+                continue
+            else:
+                #print("counting overlapping groups")
+                olpn, olpd, olrn, olrd = _count_overlapping_mentions(ol_gold_m, ol_sys_m)
+                pn += olpn
+                pd += olpd
+                rn += olrn
+                rd += olrd
+                ol_gold_m, ol_gold_s, ol_gold_e = [], None, None
+                ol_sys_m, ol_sys_s, ol_sys_e = [], None, None
+        pd += len(curr_sys_mention)
+        curr_sys_mention = None
+
+    if curr_gold_mention:
+        ol_gold_m.append(curr_gold_mention)
+        ol_gold_e = max(ol_gold_e, curr_gold_mention[-1])
+        curr_gold_mention = None
+    if curr_sys_mention:
+        ol_sys_m.append(curr_sys_mention)
+        ol_sys_e = max(ol_sys_e, curr_sys_mention[-1])
+        curr_sys_mention = None
+
+    assert curr_gold_mention is None
+    assert curr_sys_mention is None
+
+    if ol_gold_m or ol_sys_m:
+        #print("counting remaining overlapping groups")
+        olpn, olpd, olrn, olrd = _count_overlapping_mentions(ol_gold_m, ol_sys_m)
+        pn += olpn
+        pd += olpd
+        rn += olrn
+        rd += olrd
+        ol_gold_m, ol_gold_s, ol_gold_e = [], None, None
+        ol_sys_m, ol_sys_s, ol_sys_e = [], None, None
+
+    #print(f"pn={pn}, pd={pd}, rn={rn}, rd={rd}")
+
+    return pn, pd, rn, rd
+
+def _count_overlapping_mentions(gold_mentions, sys_mentions):
+    overlap_matrix = np.zeros((len(gold_mentions), len(sys_mentions)))
+    for i in range(len(gold_mentions)):
+        for j in range(len(sys_mentions)):
+            overlap_matrix[i, j] = len(gold_mentions[i].intersection(sys_mentions[j]))
+    row_ind, col_ind = linear_sum_assignment(overlap_matrix, True)
+
+    #print(overlap_matrix)
+
+    pn, pd, rn, rd = 0, 0, 0, 0
+    for r,c in zip(row_ind, col_ind):
+        pn += overlap_matrix[r,c]
+        pd += len(sys_mentions[c])
+        rn += overlap_matrix[r,c]
+        rd += len(gold_mentions[r])
+    for r in set(range(len(gold_mentions))).difference(row_ind):
+        rd += len(gold_mentions[r])
+    for c in set(range(len(sys_mentions))).difference(col_ind):
+        pd += len(sys_mentions[c])
+    #print(f"{pn} {pd} {rn} {rd}")
+
+    return pn, pd, rn, rd
 
 def b_cubed(clusters, mention_to_gold, split_antecedent_to_gold={}):
   num, den = 0, 0
