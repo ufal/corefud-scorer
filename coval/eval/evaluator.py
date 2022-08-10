@@ -296,206 +296,63 @@ def mentions(clusters, mention_to_gold, split_antecedent_to_gold={}):
   correct = setofmentions & set(mention_to_gold.keys())
   return len(correct), len(setofmentions)
 
-
-def mention_matching(gold_clusters, sys_clusters):
-    all_gold_mentions = sorted([m for c in gold_clusters for m in c])
-    all_sys_mentions = sorted([m for c in sys_clusters for m in c])
-    pn, pd, rn, rd = 0, 0, 0, 0
-    ol_gold_m, ol_gold_s, ol_gold_e = [], None, None
-    ol_sys_m, ol_gold_s, ol_gold_e = [], None, None
-    curr_gold_mention = None
-    curr_sys_mention = None
-    while all_gold_mentions and all_sys_mentions:
-        if curr_gold_mention is None:
-            curr_gold_mention = all_gold_mentions.pop(0)
-        if curr_sys_mention is None:
-            curr_sys_mention = all_sys_mentions.pop(0)
-
-        #print("--- START ---")
-        #print(f"gold: {curr_gold_mention}")
-        #print(f"sys: {curr_sys_mention}")
-
-        if ol_gold_m or ol_sys_m:
-            if ol_gold_e >= curr_sys_mention[0]:
-                ol_sys_m.append(curr_sys_mention)
-                ol_sys_e = max(ol_sys_e, curr_sys_mention[-1])
-                #print(f"gold group overlaps with sys mention, new sys group: ({ol_sys_s} to {ol_sys_e})")
-                curr_sys_mention = None
-                continue
-            elif ol_sys_e >= curr_gold_mention[0]:
-                ol_gold_m.append(curr_gold_mention)
-                ol_gold_e = max(ol_gold_e, curr_gold_mention[-1])
-                #print(f"sys group overlaps with gold mention, new gold group: ({ol_gold_s} to {ol_gold_e})")
-                curr_gold_mention = None
-                continue
-            else:
-                #print(f"counting overlapping groups: gold={ol_gold_m}, sys={ol_sys_m}")
-                olpn, olpd, olrn, olrd = _count_overlapping_mentions(ol_gold_m, ol_sys_m)
-                pn += olpn
-                pd += olpd
-                rn += olrn
-                rd += olrd
-                ol_gold_m, ol_gold_s, ol_gold_e = [], None, None
-                ol_sys_m, ol_sys_s, ol_sys_e = [], None, None
-
-        if curr_gold_mention[-1] < curr_sys_mention[0]:
-            #print("sys after gold")
-            rd += len(curr_gold_mention)
-            curr_gold_mention = None
-        elif curr_gold_mention[0] > curr_sys_mention[-1]:
-            #print("gold after sys")
-            pd += len(curr_sys_mention)
-            curr_sys_mention = None
+def mention_matching(key_clusters, sys_clusters):
+    key_sys_mentions = [(m, True) for c in key_clusters for m in c] + [(m, False) for c in sys_clusters for m in c]
+    key_sys_mentions.sort(key=lambda x: x[0])
+    key_to_process = []
+    sys_to_process = []
+    rbound = None
+    # all_counts vector: pn, pd, rn, rd
+    all_counts = np.zeros(4)
+    while key_sys_mentions:
+        if rbound is None or key_sys_mentions[0][0].start <= rbound:
+            m = key_sys_mentions.pop(0)
+            rbound = max(rbound, m[0].end) if rbound is not None else m[0].end
+            #print(m)
+            #print(rbound)
+            (key_to_process if m[1] else sys_to_process).append(m[0])
         else:
-            ol_gold_m.append(curr_gold_mention)
-            ol_gold_s, ol_gold_e = curr_gold_mention[0], curr_gold_mention[-1]
-            ol_sys_m.append(curr_sys_mention)
-            ol_sys_s, ol_sys_e = curr_sys_mention[0], curr_sys_mention[-1]
-            curr_gold_mention, curr_sys_mention = None, None
-            #print(f"gold and sys groups: ({ol_gold_s} to {ol_gold_e}) and ({ol_sys_s} to {ol_sys_e})")
+            #print(f"KEY TO PROCESS: {key_to_process}")
+            #print(f"SYS TO PROCESS: {sys_to_process}")
+            counts = _get_mention_matching_counts(key_to_process, sys_to_process)
+            #print(f"COUNTS: {counts}")
+            all_counts += counts
+            #print(f"ALL COUNTS: {all_counts}")
+            key_to_process = []
+            sys_to_process = []
+            rbound = None
+    #print(f"KEY TO PROCESS: {key_to_process}")
+    #print(f"SYS TO PROCESS: {sys_to_process}")
+    counts = _get_mention_matching_counts(key_to_process, sys_to_process)
+    #print(f"COUNTS: {counts}")
+    all_counts += counts
+    #print(f"ALL COUNTS: {all_counts}")
+    #print(f"FINAL ALL COUNTS: {all_counts}")
+    return all_counts.tolist()
 
-        #print(f"pn={pn}, pd={pd}, rn={rn}, rd={rd}")
+def _get_mention_matching_counts(key_mentions, sys_mentions):
+    # counts vector: pn, pd, rn, rd
+    counts = np.zeros(4)
 
-    while all_gold_mentions:
-        if curr_gold_mention is None:
-            curr_gold_mention = all_gold_mentions.pop(0)
-        #print("--- GOLD_ONLY ---")
-        #print(f"gold: {curr_gold_mention}")
-        #print(f"sys: {curr_sys_mention}")
-
-        if ol_gold_m or ol_sys_m:
-            if ol_sys_e >= curr_gold_mention[0]:
-                ol_gold_m.append(curr_gold_mention)
-                ol_gold_e = max(ol_gold_e, curr_gold_mention[-1])
-                #print(f"sys group overlaps with gold mention, new gold group: ({ol_gold_s} to {ol_gold_e})")
-                curr_gold_mention = None
-                continue
-            else:
-                #print(f"counting overlapping groups: gold={ol_gold_m}, sys={ol_sys_m}")
-                olpn, olpd, olrn, olrd = _count_overlapping_mentions(ol_gold_m, ol_sys_m)
-                pn += olpn
-                pd += olpd
-                rn += olrn
-                rd += olrd
-                ol_gold_m, ol_gold_s, ol_gold_e = [], None, None
-                ol_sys_m, ol_sys_s, ol_sys_e = [], None, None
-
-        if curr_sys_mention is None:
-            rd += len(curr_gold_mention)
-            curr_gold_mention = None
-        else:
-            if curr_gold_mention[-1] < curr_sys_mention[0]:
-                #print("sys after gold")
-                rd += len(curr_gold_mention)
-                curr_gold_mention = None
-            elif curr_gold_mention[0] > curr_sys_mention[-1]:
-                #print("gold after sys")
-                pd += len(curr_sys_mention)
-                curr_sys_mention = None
-            else:
-                ol_gold_m.append(curr_gold_mention)
-                ol_gold_s, ol_gold_e = curr_gold_mention[0], curr_gold_mention[-1]
-                ol_sys_m.append(curr_sys_mention)
-                ol_sys_s, ol_sys_e = curr_sys_mention[0], curr_sys_mention[-1]
-                curr_gold_mention, curr_sys_mention = None, None
-                #print(f"gold and sys groups: ({ol_gold_s} to {ol_gold_e}) and ({ol_sys_s} to {ol_sys_e})")
-
-        #print(f"pn={pn}, pd={pd}, rn={rn}, rd={rd}")
-
-    while all_sys_mentions:
-        if curr_sys_mention is None:
-            curr_sys_mention = all_sys_mentions.pop(0)
-        #print("--- SYS_ONLY ---")
-        #print(f"gold: {curr_gold_mention}")
-        #print(f"sys: {curr_sys_mention}")
-
-        if ol_gold_m or ol_sys_m:
-            if ol_gold_e >= curr_sys_mention[0]:
-                ol_sys_m.append(curr_sys_mention)
-                ol_sys_e = max(ol_sys_e, curr_sys_mention[-1])
-                #print(f"gold group overlaps with sys mention, new sys group: ({ol_sys_s} to {ol_sys_e})")
-                curr_sys_mention = None
-                continue
-            else:
-                #print(f"counting overlapping groups: gold={ol_gold_m}, sys={ol_sys_m}")
-                olpn, olpd, olrn, olrd = _count_overlapping_mentions(ol_gold_m, ol_sys_m)
-                pn += olpn
-                pd += olpd
-                rn += olrn
-                rd += olrd
-                ol_gold_m, ol_gold_s, ol_gold_e = [], None, None
-                ol_sys_m, ol_sys_s, ol_sys_e = [], None, None
-
-        if curr_gold_mention is None:
-            pd += len(curr_sys_mention)
-            curr_sys_mention = None
-        else:
-            if curr_gold_mention[-1] < curr_sys_mention[0]:
-                #print("sys after gold")
-                rd += len(curr_gold_mention)
-                curr_gold_mention = None
-            elif curr_gold_mention[0] > curr_sys_mention[-1]:
-                #print("gold after sys")
-                pd += len(curr_sys_mention)
-                curr_sys_mention = None
-            else:
-                ol_gold_m.append(curr_gold_mention)
-                ol_gold_s, ol_gold_e = curr_gold_mention[0], curr_gold_mention[-1]
-                ol_sys_m.append(curr_sys_mention)
-                ol_sys_s, ol_sys_e = curr_sys_mention[0], curr_sys_mention[-1]
-                curr_gold_mention, curr_sys_mention = None, None
-                #print(f"gold and sys groups: ({ol_gold_s} to {ol_gold_e}) and ({ol_sys_s} to {ol_sys_e})")
-
-        #print(f"pn={pn}, pd={pd}, rn={rn}, rd={rd}")
-
-    if curr_gold_mention:
-        #print(f"unprocessed gold mention: {curr_gold_mention}")
-        ol_gold_m.append(curr_gold_mention)
-        curr_gold_mention = None
-    if curr_sys_mention:
-        #print(f"unprocessed sys mention: {curr_sys_mention}")
-        ol_sys_m.append(curr_sys_mention)
-        curr_sys_mention = None
-
-    assert curr_gold_mention is None
-    assert curr_sys_mention is None
-
-    if ol_gold_m or ol_sys_m:
-        #print("counting remaining overlapping groups")
-        olpn, olpd, olrn, olrd = _count_overlapping_mentions(ol_gold_m, ol_sys_m)
-        pn += olpn
-        pd += olpd
-        rn += olrn
-        rd += olrd
-        ol_gold_m, ol_gold_s, ol_gold_e = [], None, None
-        ol_sys_m, ol_sys_s, ol_sys_e = [], None, None
-
-    #print(f"pn={pn}, pd={pd}, rn={rn}, rd={rd}")
-
-    return pn, pd, rn, rd
-
-def _count_overlapping_mentions(gold_mentions, sys_mentions):
-    overlap_matrix = np.zeros((len(gold_mentions), len(sys_mentions)))
-    for i in range(len(gold_mentions)):
+    overlap_matrix = np.zeros((len(key_mentions), len(sys_mentions)))
+    #print(overlap_matrix)
+    for i in range(len(key_mentions)):
         for j in range(len(sys_mentions)):
-            overlap_matrix[i, j] = len(gold_mentions[i].intersection(sys_mentions[j]))
+            overlap_matrix[i, j] = len(key_mentions[i].intersection(sys_mentions[j]))
     row_ind, col_ind = linear_sum_assignment(overlap_matrix, True)
 
-    #print(overlap_matrix)
-
-    pn, pd, rn, rd = 0, 0, 0, 0
     for r,c in zip(row_ind, col_ind):
-        pn += overlap_matrix[r,c]
-        pd += len(sys_mentions[c])
-        rn += overlap_matrix[r,c]
-        rd += len(gold_mentions[r])
-    for r in set(range(len(gold_mentions))).difference(row_ind):
-        rd += len(gold_mentions[r])
+        counts += np.array([
+            overlap_matrix[r,c],
+            len(sys_mentions[c]),
+            overlap_matrix[r,c],
+            len(key_mentions[r])
+        ])
+    for r in set(range(len(key_mentions))).difference(row_ind):
+        counts += np.array([0, 0, 0, len(key_mentions[r])])
     for c in set(range(len(sys_mentions))).difference(col_ind):
-        pd += len(sys_mentions[c])
-    #print(f"{pn} {pd} {rn} {rd}")
-
-    return pn, pd, rn, rd
+        counts += np.array([0, len(sys_mentions[c]), 0, 0])
+    return counts
 
 def b_cubed(clusters, mention_to_gold, split_antecedent_to_gold={}):
   num, den = 0, 0
