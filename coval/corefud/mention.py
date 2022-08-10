@@ -157,6 +157,14 @@ class Mention:
     def words(self):
         return self._words
 
+    @property
+    def start(self):
+        return self._words[0]
+
+    @property
+    def end(self):
+        return self._words[-1]
+
     def __getitem__(self, i):
         return self._words[i]
 
