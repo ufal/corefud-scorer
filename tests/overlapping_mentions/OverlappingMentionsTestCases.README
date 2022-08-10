@@ -46,6 +46,18 @@ Expected: BCUB=77/139 [recall=11/24, prec=7/10]
 Expected: MUC=4/7 [recall=1/2, prec=2/3]
 Expected: Mention=? [recall=9/23, prec=9/9=1]
 
+======= TC-OLMAA.key: two embedded key mentions with different boundaries, head of the outer mention does not lie within the inner mention =======
+
+TC-OLMAA-1 - perfect matching to both embedded keys:
+Key/Ref: {(a:2*,3) (b:12*) (c:30*,31-32) (f:65*)} {(d:48*) (e:62-63,64*,65-70)}
+Key/Ref: {(a:2-3)  (b:12)  (c:30-32)     (f:65)}  {(d:48)  (e:62-70)          }
+Expected: Mention=1 [recall=17/17=1, prec=17/17=1]
+
+TC-OLMAA-2 - matching only heads of both embedded keys + extra sys mention:
+Key/Ref: {(a:2*,3) (b:12*) (c:30*,31-32) (f:65*)}          {(d:48*) (e:62-63,64*,65-70)}
+Key/Ref: {(a:2-3)  (b:12)  (c:30-32)     (f:65)  (xf:71)}  {(d:48)  (e:64)             }
+Expected: Mention=? [recall=9/17, prec=9/10]
+
 ======= TC-OLMB.key: two embedded key mentions, both heads lie within both mentions, but are not the same =======
 
 TC-OLMB-1 - perfect matching to both embedded keys:

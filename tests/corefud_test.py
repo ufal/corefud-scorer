@@ -460,6 +460,14 @@ def test_OLMA6():
   assert evaluate(doc, b_cubed) == (11/24, 7/10, 77/139)
   assert evaluate(doc, mention_matching) == (9/23, 1, 2*9/23/(1+9/23))
 
+def test_OLMAA1():
+  doc = read('overlapping_mentions/TC-OLMAA.key', 'overlapping_mentions/TC-OLMAA-1.response')
+  assert evaluate(doc, mention_matching) == (1, 1, 1)
+
+def test_OLMAA2():
+  doc = read('overlapping_mentions/TC-OLMAA.key', 'overlapping_mentions/TC-OLMAA-2.response')
+  assert evaluate(doc, mention_matching) == approx([9/17, 9/10, 2*9/17*9/10/(9/10 + 9/17)], abs=TOL)
+
 def test_OLMB1():
   doc = read('overlapping_mentions/TC-OLMB.key', 'overlapping_mentions/TC-OLMB-1.response')
   assert evaluate(doc, muc) == (1, 1, 1)
