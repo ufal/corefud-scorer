@@ -18,7 +18,7 @@ def main():
         'lea': evaluator.lea, 'muc': evaluator.muc,
         'bcub': evaluator.b_cubed, 'ceafe': evaluator.ceafe,
         'ceafm': evaluator.ceafm, 'blanc': [evaluator.blancc,evaluator.blancn],
-        'mention': evaluator.mention_matching}
+        'mention': evaluator.mention_overlap}
   
     if 'all' in args.metrics:
         args.metrics = metric_dict.keys()

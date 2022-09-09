@@ -176,7 +176,7 @@ class Evaluator:
     elif self.metric == muc:
       pn, pd = self.metric(sys_clusters, key_clusters, sys_mention_key_cluster, sys_split_antecedent_key_p,is_split_alignment)
       rn, rd = self.metric(key_clusters, sys_clusters, key_mention_sys_cluster, key_split_antecedent_sys_r,is_split_alignment)
-    elif self.metric == mention_matching:
+    elif self.metric == mention_overlap:
       pn, pd, rn, rd = self.metric(key_clusters, sys_clusters)
     else:
       pn, pd = self.metric(sys_clusters, sys_mention_key_cluster, sys_split_antecedent_key_p)
@@ -296,7 +296,7 @@ def mentions(clusters, mention_to_gold, split_antecedent_to_gold={}):
   correct = setofmentions & set(mention_to_gold.keys())
   return len(correct), len(setofmentions)
 
-def mention_matching(key_clusters, sys_clusters):
+def mention_overlap(key_clusters, sys_clusters):
     key_sys_mentions = [(m, True) for c in key_clusters for m in c] + [(m, False) for c in sys_clusters for m in c]
     key_sys_mentions.sort(key=lambda x: x[0])
     key_to_process = []
@@ -314,7 +314,7 @@ def mention_matching(key_clusters, sys_clusters):
         else:
             #print(f"KEY TO PROCESS: {key_to_process}")
             #print(f"SYS TO PROCESS: {sys_to_process}")
-            counts = _get_mention_matching_counts(key_to_process, sys_to_process)
+            counts = _get_mention_overlap_counts(key_to_process, sys_to_process)
             #print(f"COUNTS: {counts}")
             all_counts += counts
             #print(f"ALL COUNTS: {all_counts}")
@@ -323,14 +323,14 @@ def mention_matching(key_clusters, sys_clusters):
             rbound = None
     #print(f"KEY TO PROCESS: {key_to_process}")
     #print(f"SYS TO PROCESS: {sys_to_process}")
-    counts = _get_mention_matching_counts(key_to_process, sys_to_process)
+    counts = _get_mention_overlap_counts(key_to_process, sys_to_process)
     #print(f"COUNTS: {counts}")
     all_counts += counts
     #print(f"ALL COUNTS: {all_counts}")
     #print(f"FINAL ALL COUNTS: {all_counts}")
     return all_counts.tolist()
 
-def _get_mention_matching_counts(key_mentions, sys_mentions):
+def _get_mention_overlap_counts(key_mentions, sys_mentions):
     # counts vector: pn, pd, rn, rd
     counts = np.zeros(4)
 
