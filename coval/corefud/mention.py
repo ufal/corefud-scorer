@@ -74,6 +74,14 @@ class MentionDict:
         ends_first_mentions = [km for km in starts_first_mentions if km.words[-1] == starts_first_mentions[0].words[-1]]
         return ends_first_mentions[0]
 
+    def get_item(self, m1, default_item=(None, None)):
+        if not isinstance(m1, Mention):
+            raise TypeError("Argument must be an instance of the Mention class.")
+        m2 = self._fuzzy_find(m1)
+        if m2 is not None:
+            return (m2, self._dict[m2])
+        return default_item
+
     def __contains__(self, m1):
         if isinstance(m1, Mention):
             m2 = self._fuzzy_find(m1)
@@ -150,8 +158,10 @@ class Mention:
         self._wordsset = set(self._words)
         if head:
             self._head = Mention.WordOrd(head)
+            self._is_zero = head.is_empty()
         else:
             self._head = None
+            self._is_zero = nodes[0].is_empty()
 
     @property
     def words(self):
@@ -164,6 +174,10 @@ class Mention:
     @property
     def end(self):
         return self._words[-1]
+
+    @property
+    def is_zero(self):
+        return self._is_zero
 
     def __getitem__(self, i):
         return self._words[i]

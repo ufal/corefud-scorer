@@ -178,6 +178,8 @@ class Evaluator:
       rn, rd = self.metric(key_clusters, sys_clusters, key_mention_sys_cluster, key_split_antecedent_sys_r,is_split_alignment)
     elif self.metric == mention_overlap:
       pn, pd, rn, rd = self.metric(key_clusters, sys_clusters)
+    elif self.metric == anaphor_level_score:
+      pn, pd, rn, rd = self.metric(key_clusters, sys_clusters, key_mention_sys_cluster, sys_mention_key_cluster)
     else:
       pn, pd = self.metric(sys_clusters, sys_mention_key_cluster, sys_split_antecedent_key_p)
       rn, rd = self.metric(key_clusters, key_mention_sys_cluster, key_split_antecedent_sys_r)
@@ -353,6 +355,53 @@ def _get_mention_overlap_counts(key_mentions, sys_mentions):
     for c in set(range(len(sys_mentions))).difference(col_ind):
         counts += np.array([0, len(sys_mentions[c]), 0, 0])
     return counts
+
+def als_zeros(key_clusters, sys_clusters, key_mention_to_cluster, sys_mention_to_cluster):
+    return anaphor_level_score(key_clusters, sys_clusters, key_mention_to_cluster, sys_mention_to_cluster, lambda m: m.is_zero)
+
+def anaphor_level_score(key_clusters, sys_clusters, key_mention_to_cluster, sys_mention_to_cluster, anaphor_filter):
+    tp, fp, fn, wl = (0, 0, 0, 0)
+    
+    # get the list of first mentions in sys clusters
+    sys_first_mentions = []
+    for sys_cluster in sys_clusters:
+        sys_cluster.sort()
+        sys_first_mentions.append(sys_cluster[0])
+
+    # process all key mentions, both aligned and unaligned with sys mentions
+    sys_covered_anaphs = set()
+    for key_cluster in key_clusters:
+        # enforce linear ordering of mentions
+        key_cluster.sort()
+        sys_prev_cids = set()
+        for i, key_anaph in enumerate(key_cluster):
+            # get the sys counterpart and its cluster id
+            sys_anaph, sys_anaph_cid = sys_mention_to_cluster.get_item(key_anaph)
+            # skip first mentions as they cannot be anaphors
+            # skip anaphors that do not satisfy the filtering condition
+            if i and (anaphor_filter is None or anaphor_filter(key_anaph)):
+                # no sys counterpart or the sys counterpart is a first mention
+                if sys_anaph is None or sys_anaph in sys_first_mentions:
+                    fn += 1
+                # sys counterpart's cid does not match cid of any potential antecedent
+                elif sys_anaph_cid not in sys_prev_cids:
+                    wl += 1
+                else:
+                    tp += 1
+                # label the sys anaphor as covered
+                if sys_anaph is not None:
+                    sys_covered_anaphs.add(sys_anaph)
+            # keep track of potential sys antecedents
+            if sys_anaph_cid is not None:
+                sys_prev_cids.add(sys_anaph_cid)
+    for sys_cluster in sys_clusters:
+        for sys_anaph in sys_cluster:
+            if sys_anaph not in sys_first_mentions and \
+               sys_anaph not in sys_covered_anaphs and \
+               (anaphor_filter is None or anaphor_filter(sys_anaph)):
+                fp += 1
+
+    return (tp, tp+fp+wl, tp, tp+fn+wl)
 
 def b_cubed(clusters, mention_to_gold, split_antecedent_to_gold={}):
   num, den = 0, 0
