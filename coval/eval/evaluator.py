@@ -178,7 +178,7 @@ class Evaluator:
       rn, rd = self.metric(key_clusters, sys_clusters, key_mention_sys_cluster, key_split_antecedent_sys_r,is_split_alignment)
     elif self.metric == mention_overlap:
       pn, pd, rn, rd = self.metric(key_clusters, sys_clusters)
-    elif self.metric == anaphor_level_score:
+    elif self.metric == als_zeros:
       pn, pd, rn, rd = self.metric(key_clusters, sys_clusters, key_mention_sys_cluster, sys_mention_key_cluster)
     else:
       pn, pd = self.metric(sys_clusters, sys_mention_key_cluster, sys_split_antecedent_key_p)
