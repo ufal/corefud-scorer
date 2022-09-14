@@ -179,7 +179,7 @@ class Evaluator:
     elif self.metric == mention_overlap:
       pn, pd, rn, rd = self.metric(key_clusters, sys_clusters)
     elif self.metric == als_zeros:
-      pn, pd, rn, rd = self.metric(key_clusters, sys_clusters, key_mention_sys_cluster, sys_mention_key_cluster)
+      pn, pd, rn, rd = self.metric(key_clusters, sys_clusters, key_mention_sys_cluster)
     else:
       pn, pd = self.metric(sys_clusters, sys_mention_key_cluster, sys_split_antecedent_key_p)
       rn, rd = self.metric(key_clusters, key_mention_sys_cluster, key_split_antecedent_sys_r)
@@ -356,10 +356,10 @@ def _get_mention_overlap_counts(key_mentions, sys_mentions):
         counts += np.array([0, len(sys_mentions[c]), 0, 0])
     return counts
 
-def als_zeros(key_clusters, sys_clusters, key_mention_to_cluster, sys_mention_to_cluster):
-    return anaphor_level_score(key_clusters, sys_clusters, key_mention_to_cluster, sys_mention_to_cluster, lambda m: m.is_zero)
+def als_zeros(key_clusters, sys_clusters, sys_mention_to_cluster):
+    return anaphor_level_score(key_clusters, sys_clusters, sys_mention_to_cluster, lambda m: m.is_zero)
 
-def anaphor_level_score(key_clusters, sys_clusters, key_mention_to_cluster, sys_mention_to_cluster, anaphor_filter):
+def anaphor_level_score(key_clusters, sys_clusters, sys_mention_to_cluster, anaphor_filter):
     tp, fp, fn, wl = (0, 0, 0, 0)
     
     # get the list of first mentions in sys clusters
@@ -380,14 +380,22 @@ def anaphor_level_score(key_clusters, sys_clusters, key_mention_to_cluster, sys_
             # skip first mentions as they cannot be anaphors
             # skip anaphors that do not satisfy the filtering condition
             if i and (anaphor_filter is None or anaphor_filter(key_anaph)):
+                #print(f"KEY CLUSTER: {key_cluster}\tKEY ANAPH: {key_anaph}")
+                #if sys_anaph_cid is not None:
+                #    print(f"SYS CLUSTER: {sys_clusters[sys_anaph_cid]}\tSYS ANAPH: {sys_anaph}")
+                #else:
+                #    print(f"SYS CLUSTER: None\tSYS ANAPH: None")
                 # no sys counterpart or the sys counterpart is a first mention
                 if sys_anaph is None or sys_anaph in sys_first_mentions:
                     fn += 1
+                    #print(f"RESULT: FN\t{[tp, fp, fn, wl]}")
                 # sys counterpart's cid does not match cid of any potential antecedent
                 elif sys_anaph_cid not in sys_prev_cids:
                     wl += 1
+                    #print(f"RESULT: WL\t{[tp, fp, fn, wl]}")
                 else:
                     tp += 1
+                    #print(f"RESULT: TP\t{[tp, fp, fn, wl]}")
                 # label the sys anaphor as covered
                 if sys_anaph is not None:
                     sys_covered_anaphs.add(sys_anaph)
@@ -399,7 +407,9 @@ def anaphor_level_score(key_clusters, sys_clusters, key_mention_to_cluster, sys_
             if sys_anaph not in sys_first_mentions and \
                sys_anaph not in sys_covered_anaphs and \
                (anaphor_filter is None or anaphor_filter(sys_anaph)):
+                #print(f"SYS CLUSTER: {sys_cluster}\tSYS ANAPH: {sys_anaph}")
                 fp += 1
+                #print(f"RESULT: FP\t{[tp, fp, fn, wl]}")
 
     return (tp, tp+fp+wl, tp, tp+fn+wl)
 
