@@ -1,4 +1,4 @@
-#The README will need to be updated.
+# The README is out of date and will need to be updated!
 # The Universal Anaphora Scorer
 ## Introduction
 This repository contains code introduced in the following paper:
