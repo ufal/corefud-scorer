@@ -129,8 +129,8 @@ def get_coref_infos(key_file,
         assert docname in sys_doc_clusters
 
         # pay attention to key heads only in partial and head matching, and to sys heads only in head matching
-        key_clusters = transform_clusters_for_eval(key_doc_clusters[docname], matching in ["partial", "head"])
-        sys_clusters = transform_clusters_for_eval(sys_doc_clusters[docname], matching == "head")
+        key_clusters = transform_clusters_for_eval(key_doc_clusters[docname], matching == "exact")
+        sys_clusters = transform_clusters_for_eval(sys_doc_clusters[docname], matching in ["exact", "partial"])
 
         key_clusters, key_removed_singletons = process_clusters(key_clusters, keep_singletons)
         sys_clusters, sys_removed_singletons = process_clusters(sys_clusters, keep_singletons)
