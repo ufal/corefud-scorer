@@ -3,7 +3,7 @@
 # sent_id = modified.nw.xinhua.00.chtb_0009-1
 # text = sentence
 1	_	_	_	_	_	0	_	_	_
-2	_	_	_	_	_	0	_	_	Entity=(e10043-x-1-(e10054-x-1-
+2	_	_	_	_	_	0	_	_	Entity=(e10043-x-9-(e10054-x-2-
 3	_	_	_	_	_	0	_	_	_
 4	_	_	_	_	_	0	_	_	_
 5	_	_	_	_	_	0	_	_	Entity=e10054)
