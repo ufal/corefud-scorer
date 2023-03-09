@@ -8,8 +8,13 @@ from coval.eval.evaluator import muc, b_cubed, ceafe, lea, ceafm, blancc, blancn
 TOL = 1e-4
 
 
-def read(key, response, exact_match=False):
-  return get_coref_infos('tests/%s' % key, 'tests/%s' % response, exact_match, True)
+def read(key, response, exact_match=False, head_match=False):
+  matching = "partial"
+  if exact_match:
+      matching = "exact"
+  elif head_match:
+      matching = "head"
+  return get_coref_infos('tests/%s' % key, 'tests/%s' % response, matching, True)
 
 def test_A1():
   doc = read('TC-A.key', 'TC-A-1.response', exact_match=True)
@@ -548,3 +553,14 @@ def test_OLMC7():
   assert evaluate(doc, ceafm) == approx([1, 3/5, 3/4], abs=TOL)
   assert evaluate(doc, mention_overlap) == (20/23, 20/40, 2*20/23*20/40/(20/40+20/23))
 
+#################################### TESTS ON HEAD MATCHING ###################################
+
+def test_HMA1():
+  doc = read('head_match/TC-HMA.key', 'head_match/TC-HMA-1.response', head_match=True)
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_HMA2():
+  doc = read('head_match/TC-HMA.key', 'head_match/TC-HMA-2.response', head_match=True)
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
