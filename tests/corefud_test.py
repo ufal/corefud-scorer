@@ -564,3 +564,18 @@ def test_HMA2():
   doc = read('head_match/TC-HMA.key', 'head_match/TC-HMA-2.response', head_match=True)
   assert evaluate(doc, muc) == (1, 1, 1)
   assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_HMA3():
+  doc = read('head_match/TC-HMA.key', 'head_match/TC-HMA-3.response', head_match=True)
+  assert evaluate(doc, muc) == (1, 1, 1)
+  assert evaluate(doc, b_cubed) == (1, 1, 1)
+
+def test_HMA4():
+  doc = read('head_match/TC-HMA.key', 'head_match/TC-HMA-4.response', head_match=True)
+  assert evaluate(doc, muc) == (3/4, 3/4, 3/4)
+  assert evaluate(doc, b_cubed) == (17/24, 17/24, 17/24)
+
+def test_HMA5():
+  doc = read('head_match/TC-HMA.key', 'head_match/TC-HMA-5.response', head_match=True)
+  assert evaluate(doc, muc) == (3/4, 3/4, 3/4)
+  assert evaluate(doc, b_cubed) == (17/24, 17/24, 17/24)
