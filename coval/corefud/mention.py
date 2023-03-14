@@ -194,6 +194,12 @@ class Mention:
         words_zip = zip(self._words, other._words)
         return all(self_w == other_w for self_w, other_w in words_zip)
 
+    def _head_match(self, other):
+        """Mentions `self` and `other` are matched by their head, i.e. it is sufficient
+        for the mentions to have identical heads.
+        """
+        return self._head == other._head
+
     def _partial_subset_match(self, other):
         """Mentions `self` and `other` can be matched partially/fuzzilly only if a head
         is defined for at least one of the mentions. The other mention is then expected
@@ -202,7 +208,9 @@ class Mention:
         that corresponds to the head belongs to this subset. If none of the mentions
         has a head specified, resort to exact matching.
         """
-        if self._head:
+        if self._head and other._head:
+            return self._head_match(other)
+        elif self._head:
             return (other._wordsset.issubset(self._wordsset) \
                 and self._head in other._wordsset)
         elif other._head:

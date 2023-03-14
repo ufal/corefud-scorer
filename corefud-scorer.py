@@ -11,7 +11,8 @@ def main():
     argparser.add_argument('sys_file', type=str, help='path to the system/response file')
     argparser.add_argument('-m', '--metrics', choices=['all', 'lea', 'muc', 'bcub', 'ceafe', 'ceafm', 'blanc', 'mention', 'zero'], nargs='*', default='all', help='metrics to be used for evaluation')
     argparser.add_argument('-s', '--keep-singletons', action='store_true', default=False, help='evaluate also singletons; ignored otherwise')
-    argparser.add_argument('-x', '--exact-match', action='store_true', default=False, help='use exact match for matching key and system mentions; partial match otherwise')
+    argparser.add_argument('-t', '--match', type=str, choices=["exact", "partial", "head"], help='choose the type of mention matching: exact, partial, head')
+    argparser.add_argument('-x', '--exact-match', action='store_true', default=False, help='use exact match for matching key and system mentions; overrides the value chosen by --match|-t')
     args = argparser.parse_args()
     
     metric_dict = {
@@ -25,17 +26,21 @@ def main():
         args.metrics = metric_dict.keys()
     args.metrics = [(name, metric_dict[name]) for name in args.metrics]
 
+    # --exact-match|-x overrides the --match|-t parameter
+    if args.exact_match:
+        args.match = "exact"
+
     msg = 'The scorer is evaluating coreference {:s} singletons, with {:s} matching of mentions using the following metrics: {:s}.'.format(
         'including' if args.keep_singletons else 'excluding',
-        'exact' if args.exact_match else 'partial',
+        args.match,
         ", ".join([name for name, f in args.metrics]))
     print(msg)
 
-    evaluate(args.key_file, args.sys_file, args.metrics, args.exact_match, args.keep_singletons)
+    evaluate(args.key_file, args.sys_file, args.metrics, args.match, args.keep_singletons)
 
-def evaluate(key_file, sys_file, metrics, exact_matching, keep_singletons):
+def evaluate(key_file, sys_file, metrics, matching, keep_singletons):
 
-    coref_infos = reader.get_coref_infos(key_file, sys_file, exact_matching, keep_singletons)
+    coref_infos = reader.get_coref_infos(key_file, sys_file, matching, keep_singletons)
     
     conll = 0
     conll_subparts_num = 0
