@@ -2,7 +2,7 @@
 
 ## About
 
-CorefUD scorer is a scorer for coreference and anaphoric relations that are harmonized under the same scheme defined by the [CorefUD 1.0](https://ufal.mff.cuni.cz/corefud) project.
+CorefUD scorer is a scorer for coreference and anaphoric relations that are harmonized under the same scheme defined by the [CorefUD](https://ufal.mff.cuni.cz/corefud) project.
 
 The scorer builds on the following projects:
 
@@ -12,7 +12,7 @@ The scorer builds on the following projects:
 
 Unlike any of the previous scorers, CorefUD scorer is adjusted to process and correctly evaluate also non-contiguous mentions.
 
-It supports both exact match and partial match of mentions. Partial match is an alternative to minimum span evaluation by the UA scorer. In addition, the evaluation can be run with singletons taken into account.
+It supports exact, partial and head match of mentions. Partial match is an alternative to minimum span evaluation by the UA scorer. Head match compares whether the mention heads are the identical tokens. In addition, the evaluation can be run with singletons taken into account.
 
 For the time being, the scorer is able to evaluate coreference only, excluding split antecedents, bridging and other relations.
 
@@ -138,7 +138,30 @@ And this does not have to be in line with a coreference resolution system.
 In order to ensure fair comparison, all singletons are excluded from both key and response files.
 Nevertheless, evaluation with singletons included may be turned on by the `-s, --keep-singletons` option.
 
-### Authors
+## Shared Tasks
+
+### CRAC 2022
+
+[CRAC 2022 Shared Task on Multilingual Coreference Resolution](https://ufal.mff.cuni.cz/corefud/crac22) used this scorer in version 1.0 (and some features of the version 1.1 for the Findings paper) as an official scorer to evaluate the submissions.
+The primary score to rank the submissions was the macro-average of the CoNLL F1 of identity coreference calculated for each dataset.
+It was computed without singletons using partial matching.
+Split antecedents, bridging and other anaphoric relations were not included into the evaluation.
+
+### CRAC 2023
+
+[CRAC 2023 Shared Task on Multilingual Coreference Resolution](https://ufal.mff.cuni.cz/corefud/crac23)
+
+
+## Change Log
+
+* 2022-02-15 v1.1
+  * mention overlap score added
+  * anaphor-decomposable score for zeros added
+  * head match added
+* 2022-05-03 v1.0
+  * initial version
+
+## Authors
 
 * Michal Novák, Charles University, Prague, Czech Republic, mnovak@ufal.mff.cuni.cz
 * Yilun Zhu, Georgetown University, Washington D.C., USA, yz565@georgetown.edu
@@ -158,7 +181,7 @@ The original reference Coreference Scorer (CoNLL 2012 scorer) was developed by:
 *  Sebastian Martschat, sebastian.martschat@h-its.org
 *  Xiaoqiang Luo, xql@google.com
 
-### References
+## References
   
   Amit Bagga and Breck Baldwin.  1998.
   Algorithms for scoring coreference chains.
