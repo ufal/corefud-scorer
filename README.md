@@ -111,14 +111,14 @@ Setting of mention heads in both key and response files is ignored in this setup
 
 In *partial matching*, the two mentions are considered matching if and only if the key mention contains all words from the response mention and a key mention head is included among the response mention words at the same time.
 As the mentions within a document may be embedded or even crossing, a mention *m* from one file may potentially match more than a single mention *n* from the other file.
-To end up with a single matched mention, the following rules are obeyed:
+To end up with a single matched mention, the following disambiguation rules are obeyed:
 1. pick the mention that overlaps with *m* with proportionally smallest difference
 2. if still more than one *n* remain, pick the one that starts earlier in the document
 3. if still more than one *n* remain, pick the one that ends earlier in the document
 
 Data that comply with the CorefUD 1.0 format are required to have all mentions labeled with a mention head, which is one of the mention words that syntactically (but often also semantically) governs the whole mention.
 (WARNING: Do not confuse with the `HEAD` field in the CoNLL-U format, which marks a dependency parent of current node)
-Mention heads in CorefUD 1.0 data have been selected by [heuristics](https://github.com/udapi/udapi-python/blob/master/udapi/block/corefud/movehead.py) based on the dependency structure of the sentence the mention belongs to.
+Mention heads in CorefUD data have been selected by [heuristics](https://github.com/udapi/udapi-python/blob/master/udapi/block/corefud/movehead.py) based on the dependency structure of the sentence the mention belongs to.
 In the following example, the 3rd word of the mention `the viewing experience of art`, i.e. the word `experience`, is labeled as the mention head:
 ```
 1   The        ...   Entity=(e27-abstract-3-
@@ -137,14 +137,18 @@ Even though marking mention head index in CorefUD 1.0 format is mandatory, heads
 #### Head Matching
 
 In *head matching*, the two mentions are considered matching if their heads correspond to identical tokens.
-If there are multiple key or response mentions with the same head
+If there are multiple key or response mentions with the same head, the same disambiguation rules as in the partial matching are used.
+In other words, as long as there are no mentions in either the key or the response file that share the same head, only mention heads are used to match key and response mentions.
+Full mention spans are ignored in such case.
+However, full spans can be taken into account but only to disambiguate between multiple mentions with the same head.
 
-A coreference resolution system producing response mentions can thus set each mention head index to value `1`, setting the first word of a mention as its head.
+In order for a coreference resolver to succeed with respect to head matching, it should focus on predicting not only the mention span but also its head.
+If the resolver is able to predict mention spans only (and, for instance, sets each mention head index to value `1`, selecting always the first word of a mention as its head), mention heads can be estimated using the dependency tree obtained by a parser (the CorefUD data already contain annotation of dependency syntax) and some heuristics, e.g. [the one provided by Udapi](https://github.com/udapi/udapi-python/blob/master/udapi/block/corefud/movehead.py).
 
 #### Discontinuous mentions
 
 CorefUD scorer allows for evaluating discontinuous mentions in any of the input files.
-This is why mention matching is based on set-subset relations between sets of words in mentions, instead of comparing positions of mention starts and ends, which is usual in previous scorers, e.g. in CoNLL 2012 scorer and UA scorer.
+This is why mention matching is based on set-subset relations between sets of words in mentions, instead of comparing positions of mention starts and ends, which is usual in previous scorers, e.g. in CoNLL 2012 scorer and UA scorer 1.0.
 
 ### Singletons
 
@@ -152,7 +156,7 @@ Singletons are entities that contain only a single mention.
 Datasets often differ in the aspect whether singletons have been annotated or not.
 And this does not have to be in line with a coreference resolution system.
 
-In order to ensure fair comparison, all singletons are excluded from both key and response files.
+In order to ensure fair comparison, all singletons are excluded from both key and response files by default.
 Nevertheless, evaluation with singletons included may be turned on by the `-s, --keep-singletons` option.
 
 ## Shared Tasks
@@ -166,8 +170,9 @@ Split antecedents, bridging and other anaphoric relations were not included into
 
 ### CRAC 2023
 
-[CRAC 2023 Shared Task on Multilingual Coreference Resolution](https://ufal.mff.cuni.cz/corefud/crac23)
-
+[CRAC 2023 Shared Task on Multilingual Coreference Resolution](https://ufal.mff.cuni.cz/corefud/crac23) uses this scorer in version 1.1 as an official scorer to evaluate the submissions.
+The primary score to rank the submissions is the macro-average of the CoNLL F1 of identity coreference calculated for each dataset, computed without singletons using head matching.
+Split antecedents, bridging and other anaphoric relations are not included into the evaluation.
 
 ## Change Log
 
