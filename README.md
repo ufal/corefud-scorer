@@ -2,7 +2,7 @@
 
 ## About
 
-CorefUD scorer is a scorer for coreference and anaphoric relations that are harmonized under the same scheme defined by the [CorefUD](https://ufal.mff.cuni.cz/corefud) project.
+CorefUD acorer is a scorer for coreference and anaphoric relations that are harmonized under the same scheme defined by the [CorefUD](https://ufal.mff.cuni.cz/corefud) project.
 
 The scorer builds on the following projects:
 
@@ -12,7 +12,7 @@ The scorer builds on the following projects:
 
 Unlike any of the previous scorers, CorefUD scorer is adjusted to process and correctly evaluate also non-contiguous mentions.
 
-It supports exact, partial and head match of mentions. Partial match is an alternative to minimum span evaluation by the UA scorer. Head match compares whether the mention heads are the identical tokens. In addition, the evaluation can be run with singletons taken into account.
+It supports exact, partial and head match of mentions. Partial match is an alternative to minimum span evaluation by the UA scorer. Head match compares whether the mention heads are represented by identical tokens. In addition, the evaluation can be run with singletons taken into account.
 
 For the time being, the scorer is able to evaluate coreference only, excluding split antecedents, bridging and other relations.
 
@@ -33,13 +33,14 @@ where `key` and `system` are the location of the key/reference and system/respon
 
 Options:
 
-- `-m, --metrics METRIC[ METRIC]*`: select specific metrics to be evaluated; default: `all`; possible values: `[muc|bcub|ceafe|ceafm|blanc|lea|all]`
+- `-m, --metrics METRIC[ METRIC]*`: select specific metrics to be evaluated; default: `all`; possible values: `[muc|bcub|ceafe|ceafm|blanc|lea|mor|zero|all]`
 - `-s, --keep-singletons`: evaluate also singletons; otherwise any singletons in the key or system files are ignored
-- `-x, --exact-match`: mentions in the key and sys files are matched only if they are exactly the same; otherwise the partial match is applied
+- `-a, --match`: select the way of mention matching; default: `head`; possible values: `[exact|partial|head]`
+- `-x, --exact-match`: a shortcut for enabling exact matching; corresponds to `-a exact`
 
 ## Details
 
-By default, the CorefUD scorer calculates all evaluation metrics using partial match and ignoring all singletons.
+By default, the CorefUD scorer calculates all evaluation metrics using head match and ignoring all singletons.
 
 ### <a name="input_files"></a>Input Files
 
@@ -61,7 +62,7 @@ The easiest way to satisfy all the requirements above is to ensure that the key 
 
 ### Evaluation Metrics
 
-Evaluation using any of the following metrics is supported:
+Evaluation using any of the standard following metrics is supported:
 - MUC [Vilain et al, 1995]
 - B-cubed [Bagga and Baldwin, 1998]
 - CEAF in the entity (CEAFe) and mention (CEAFm) variant [Luo, 2005]
@@ -69,7 +70,11 @@ Evaluation using any of the following metrics is supported:
 - LEA [Moosavi and Strube, 2016]
 - the averaged CoNLL score (the average of the F1 values of MUC, B-cubed and CEAFe) [Denis and Baldridge, 2009a; Pradhan et al., 2014].
 
-You can also select only specific metrics by including one or some of the `muc`, `bcub`, `ceafe`, `ceafm`, `blanc` and `lea` values as parameters of the option `-m, --metrics`.
+Also two supplementary measures introduced for CRAC 2022 shared task are supported:
+- MOR -- Mention Overlap Ratio [Žabokrtský et al., 2022]
+- Anaphor-decomposable score for zeros [Žabokrtský et al., 2022]
+
+You can also select only specific metrics by including one or some of the `muc`, `bcub`, `ceafe`, `ceafm`, `blanc`, `lea`, `mor`, `zero` values as parameters of the option `-m, --metrics`.
 CoNLL score is reported automatically if all MUC, B-cubed and CEAFe are calculated.
 For instance, the following command only reports the CEAFe and LEA scores:
 
@@ -84,17 +89,23 @@ Alternatively, potentially unlimited list of metrics may be passed as the last a
 
 A fundamental element of all the metrics above is whether there is a correspondence between a key mention and a response mention.
 In other words, if the two mentions, each from one of the two input files, are matching.
-CorefUD scorer distinguishes between two types of mention matching:
+CorefUD scorer distinguishes between three types of mention matching:
 1. exact
 2. partial/fuzzy
-This can be controlled by the `-x, --exact-match` option, which switches on exact matching.
-Otherwise, mentions are compared with partial matching.
+3. head
+This can be controlled by the `-a, --match [exact|partial|head]` option.
+As a shortcut, the `-x, --exact-match` option switches on exact matching and is thus equivalent to `-a exact`.
+By default, mentions are compared with head matching.
+
+*Changed in version 1.1: default matching changed from partial to head.*
 
 #### Exact Matching
 
 In *exact matching*, the two mentions are considered matching if and only if they consist of the same set of words.
 A word is defined here only by its position within the sentence and by position of the sentence within the whole file.
 This is sufficient as one-to-one alignment of word forms has been already ensured by passing the file alignment requirements specified [above](#input_files).
+
+Setting of mention heads in both key and response files is ignored in this setup.
 
 #### Partial Matching
 
@@ -119,9 +130,15 @@ In the following example, the 3rd word of the mention `the viewing experience of
 ...
 ```
 
-Each key mention is represented by all its words and its head, where the `--exact-match` option determines if the head is going to be taken into account or not.
+In partial matching, each key mention is represented by all its words and its head (unlike in exact matching, where heads of key mentions are ignored).
 On the other hand, the only information on response mentions the scorer keeps are the words that the mention consists of.
-Even though marking mention head index in CorefUD 1.0 format is mandatory, unlike in the case of key mentions, heads of response mentions are simply ignored during evaluation.
+Even though marking mention head index in CorefUD 1.0 format is mandatory, heads of response mentions are simply ignored during evaluation with partial matching.
+
+#### Head Matching
+
+In *head matching*, the two mentions are considered matching if their heads correspond to identical tokens.
+If there are multiple key or response mentions with the same head
+
 A coreference resolution system producing response mentions can thus set each mention head index to value `1`, setting the first word of a mention as its head.
 
 #### Discontinuous mentions
@@ -227,3 +244,7 @@ The original reference Coreference Scorer (CoNLL 2012 scorer) was developed by:
   Marc Vilain, John Burger, John Aberdeen, Dennis Connolly, and Lynette Hirschman. 1995.
   A model theoretic coreference scoring scheme.
   In Proceedings of the 6th Message Understanding Conference, pages 45–52.
+
+  Zdeněk Žabokrtský, Miloslav Konopík, Anna Nedoluzhko, Michal Novák, Maciej Ogrodniczuk, Martin Popel, Ondřej Pražák, Jakub Sido, Daniel Zeman, and Yilun Zhu. 2022.
+  Findings of the Shared Task on Multilingual Coreference Resolution.
+  In Proceedings of the CRAC 2022 Shared Task on Multilingual Coreference Resolution, pages 1–17.
