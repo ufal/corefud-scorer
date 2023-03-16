@@ -108,7 +108,7 @@ def get_mention_assignments(clusters):
 
 def get_coref_infos(key_file,
         sys_file,
-        matching,
+        matching="head",
         keep_singletons=True):
 
     # loading the documents
