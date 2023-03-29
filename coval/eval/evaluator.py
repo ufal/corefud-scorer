@@ -363,10 +363,10 @@ def anaphor_level_score(key_clusters, sys_clusters, sys_mention_to_cluster, anap
     tp, fp, fn, wl = (0, 0, 0, 0)
     
     # get the list of first mentions in sys clusters
-    sys_first_mentions = []
+    sys_first_mentions = set()
     for sys_cluster in sys_clusters:
         sys_cluster.sort()
-        sys_first_mentions.append(sys_cluster[0])
+        sys_first_mentions.add(sys_cluster[0])
 
     # process all key mentions, both aligned and unaligned with sys mentions
     sys_covered_anaphs = set()
