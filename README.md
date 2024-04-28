@@ -176,7 +176,9 @@ Split antecedents, bridging and other anaphoric relations are not included into 
 
 ## Change Log
 
-* 2022-02-15 v1.1
+* 2024-05-01 v1.2
+  * using a modified version of the UA scorer 2.0 as the backbone
+* 2023-02-15 v1.1
   * mention overlap score added
   * anaphor-decomposable score for zeros added
   * head match added
@@ -186,8 +188,9 @@ Split antecedents, bridging and other anaphoric relations are not included into 
 ## Authors
 
 * Michal Novák, Charles University, Prague, Czech Republic, mnovak@ufal.mff.cuni.cz
-* Yilun Zhu, Georgetown University, Washington D.C., USA, yz565@georgetown.edu
+* Juntao Yu, Queen Mary University of London, juntao.cn@gmail.com
 * Martin Popel, Charles University, Prague, Czech Republic, popel@ufal.mff.cuni.cz
+* Yilun Zhu, Georgetown University, Washington D.C., USA, yz565@georgetown.edu
 
 The Universal Anaphora scorer has been developed by:
 
@@ -195,6 +198,9 @@ The Universal Anaphora scorer has been developed by:
 * Nafise Moosavi, UKP, TU Darmstadt, ns.moosavi@gmail.com
 * Silviu Paun, Queen Mary University of London, spaun3691@gmail.com
 * Massimo Poesio, Queen Mary University of London, poesio@gmail.com
+* Michal Novák, Charles University, Prague, Czech Republic, mnovak@ufal.mff.cuni.cz
+* Martin Popel, Charles University, Prague, Czech Republic, popel@ufal.mff.cuni.cz
+* Yilun Zhu, Georgetown University, Washington D.C., USA, yz565@georgetown.edu
 
 The original reference Coreference Scorer (CoNLL 2012 scorer) was developed by:
 
