@@ -716,10 +716,65 @@ def test_ZC1_exlcude_zeros():
   assert evaluate(doc, [blancc,blancn]) == (1,1,1)
 
 def test_ZC2():
-  doc = read('TC-ZC.key', 'TC-ZC-2.response','zeros', keep_zeros=True)
+  doc = read('TC-ZC.key', 'TC-ZC-2.response', keep_zeros=True)
   assert evaluate(doc, muc) == approx([1 / 3, 1 / 1, 1 / 2])
   assert evaluate(doc, b_cubed) == approx([(7 / 3) / 6, 3 / 3, 14 / 25])
   assert evaluate(doc, ceafe) == approx([0.6, 0.9, 0.72])
   assert evaluate(doc, ceafm) == approx([0.5, 1, 0.66667], abs=TOL)
   assert evaluate(doc, lea) == approx([(1 + 3 * (1 / 3)) / 6, 1, 0.5])
   assert evaluate(doc, [blancc,blancn]) == approx([0.21591, 1, 0.35385], abs=TOL)
+
+def test_ZD1():
+  doc = read('TC-ZD.key', 'TC-ZD-1.response', keep_zeros=True)
+  assert evaluate(doc, b_cubed) == approx([6/6, 6/6, 1])
+  assert evaluate(doc, muc) == approx([3/3, 3/3, 1])
+
+def test_ZD2():
+  doc = read('TC-ZD.key', 'TC-ZD-2.response', keep_zeros=True)
+  assert evaluate(doc, b_cubed) == approx([6/6, 6/6, 1])
+  assert evaluate(doc, muc) == approx([3/3, 3/3, 1])
+
+def test_ZD2_head():
+  doc = read('TC-ZD.key', 'TC-ZD-2.response', matching="head", keep_zeros=True)
+  assert evaluate(doc, b_cubed) == approx([26/36, 26/36, 26/36])
+  assert evaluate(doc, muc) == approx([2/3, 2/3, 2/3])
+
+def test_ZD3():
+  doc = read('TC-ZD.key', 'TC-ZD-3.response', keep_zeros=True)
+  assert evaluate(doc, b_cubed) == approx([6/6, 6/6, 1])
+  assert evaluate(doc, muc) == approx([3/3, 3/3, 1])
+
+def test_ZD3_exact():
+  doc = read('TC-ZD.key', 'TC-ZD-3.response', matching="exact", keep_zeros=True)
+  assert evaluate(doc, b_cubed) == approx([26/36, 26/36, 26/36])
+  assert evaluate(doc, muc) == approx([2/3, 2/3, 2/3])
+
+def test_ZD3_head():
+  doc = read('TC-ZD.key', 'TC-ZD-3.response', matching="head", keep_zeros=True)
+  assert evaluate(doc, b_cubed) == approx([26/36, 26/36, 26/36])
+  assert evaluate(doc, muc) == approx([2/3, 2/3, 2/3])
+
+def test_ZE1():
+  doc = read('TC-ZE.key', 'TC-ZE-1.response', keep_zeros=True)
+  assert evaluate(doc, b_cubed) == approx([6/6, 6/6, 1])
+  assert evaluate(doc, muc) == approx([3/3, 3/3, 1])
+
+def test_ZE1_head():
+  doc = read('TC-ZE.key', 'TC-ZE-1.response', matching="head", keep_zeros=True)
+  assert evaluate(doc, b_cubed) == approx([26/36, 26/36, 26/36])
+  assert evaluate(doc, muc) == approx([2/3, 2/3, 2/3])
+
+def test_ZE2():
+  doc = read('TC-ZE.key', 'TC-ZE-2.response', keep_zeros=True)
+  assert evaluate(doc, b_cubed) == approx([6/6, 6/6, 1])
+  assert evaluate(doc, muc) == approx([3/3, 3/3, 1])
+
+def test_ZE2_exact():
+  doc = read('TC-ZE.key', 'TC-ZE-2.response', matching="exact", keep_zeros=True)
+  assert evaluate(doc, b_cubed) == approx([26/36, 26/36, 26/36])
+  assert evaluate(doc, muc) == approx([2/3, 2/3, 2/3])
+
+def test_ZE2_head():
+  doc = read('TC-ZE.key', 'TC-ZE-2.response', matching="head", keep_zeros=True)
+  assert evaluate(doc, b_cubed) == approx([26/36, 26/36, 26/36])
+  assert evaluate(doc, muc) == approx([2/3, 2/3, 2/3])

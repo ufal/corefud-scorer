@@ -75,7 +75,7 @@ class Reader:
                         "Mention span {:s} has been already indexed with cluster_id = {:d}. New cluster_id = {:d}".format(
                             str(m), mention_cluster_ids[m], cluster_id))
                 mention_cluster_ids[m] = cluster_id
-                if not m.is_split_antecedent and not m.is_zero and m not in other_mention_set:
+                if not m.is_split_antecedent and m not in other_mention_set:
                     mention_non_aligned.append(m)
         return mention_cluster_ids, mention_non_aligned
 
