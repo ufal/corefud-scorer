@@ -28,6 +28,8 @@ def corefud_to_ua_args(corefud_args):
     # new arguments
     ua_args["format"] = "corefud"
     ua_args["keep_split_antecedents"] = False
+    ua_args["keep_zeros"] = True
+    ua_args["zero_match_method"] = 'linear'
     ua_args["evaluate_discourse_deixis"] = False
     ua_args["only_split_antecedent"] = False
     ua_args["allow_boundary_crossing"] = False
