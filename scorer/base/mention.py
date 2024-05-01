@@ -171,6 +171,9 @@ class Mention:
     def head_match_score(self, other):
         # only support CorefUD format yet
         return NotImplemented
+    
+    def _zero_dependent_match_score(self, other):
+        return NotImplemented
 
     def _exact_match_hash(self):
         return hash(frozenset(self._words))
