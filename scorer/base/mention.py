@@ -172,7 +172,7 @@ class Mention:
         # only support CorefUD format yet
         return NotImplemented
     
-    def _zero_dependent_match_score(self, other):
+    def zero_dependent_match_score(self, other):
         return NotImplemented
 
     def _exact_match_hash(self):

@@ -101,7 +101,7 @@ class Reader:
                 similarity = np.zeros((len(key_zeros), len(sys_zeros)))
                 for i, km in enumerate(key_zeros):
                     for j, sm in enumerate(sys_zeros):
-                        similarity[i, j] = km._zero_dependent_match_score(sm)
+                        similarity[i, j] = km.zero_dependent_match_score(sm)
                 # print(similarity)
                 key_ind, sys_ind = linear_sum_assignment(-similarity)
                 for k, s in zip(key_ind, sys_ind):
@@ -111,7 +111,7 @@ class Reader:
                         mention_alignment_dict[sys_mention] = key_mention
                         mention_alignment_dict[key_mention] = sys_mention
 
-
+        # TODO: try to match only unmatched zeros
 
         logging.debug('Total key mentions:', len(key_mention_set))
         logging.debug('Total response mentions:', len(sys_mention_set))

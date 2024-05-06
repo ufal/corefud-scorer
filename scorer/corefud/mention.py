@@ -65,8 +65,11 @@ class CorefUDMention(Mention):
         if head:
             self._minset.add(CorefUDMention.WordOrd(head))
             self._is_zero = head.is_empty()
+            # TODO: storing head deps separately from the minset is not ideal
+            self._head_deps = head.deps
         else:
             self._is_zero = nodes[0].is_empty()
+            self._head_deps = nodes[0].deps
 
     # head matching as defined in CRAC 2023 shared task
     # if there are multiple candidates sharing the same head
@@ -84,6 +87,26 @@ class CorefUDMention(Mention):
             return len(self._wordsset & other._wordsset) * 1.0 / len(self._wordsset)
         return 0.0
     
-    #TODO to be implemented by Michal
-    def _zero_dependent_match_score(self,other):
-        return NotImplemented
+    def _f_score(self, set1, set2):
+        common = set1 & set2
+        p = len(common) / len(set1)
+        r = len(common) / len(set2)
+        if p > 0 and r > 0:
+            return 2*p*r/(p+r)
+        return 0
+
+    def zero_dependent_match_score(self, other):
+        self_head = list(self._minset).pop()
+        other_head = list(other._minset).pop()
+        if self_head._sentord != other_head._sentord:
+            return 0.0
+        score = 0.0
+        # the f-score of predicting both parent and deprel of deps: weigh it by the factor 10
+        self_deps = set([(dep['parent'], dep['deprel']) for dep in self._head_deps])
+        other_deps = set([(dep['parent'], dep['deprel']) for dep in other._head_deps])
+        score += 10 * self._f_score(self_deps, other_deps)
+        # the f-score of predicting just the parent: weigh it by the factor 1
+        self_deps = set([dep['parent'] for dep in self._head_deps])
+        other_deps = set([dep['parent'] for dep in other._head_deps])
+        score += self._f_score(self_deps, other_deps)
+        return score
