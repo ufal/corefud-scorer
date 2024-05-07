@@ -160,3 +160,60 @@ Key/Ref: {(a:1*,2)} {(b:4*,5-7) (c:11) (e:15*,15.1,16-17)} {(d:13*,14) (f:19*)}
 Rsp/Sys: {(a:1*,2)} {(b:4*,5-7) (c:11) (e:15,15.1*)} {(d:13*,14) (f:19*)}
 Expected: BCUB=26/36 [recall=26/36, prec=26/36]
 Expected: MUC=2/3 [recall=2/3, prec=2/3]
+
+In TC-ZF, c is a single-token zero specified both by its position as well its deps value
+From now on, head match and dependency zero match is used by default.
+
+TC-ZF-1 -- matching a zero both by its position and by its deps value
+Key/Ref: {(a:1*,2) (c:12*) (d:15.1*)} {(b:4*,5-7) (e:19*)}
+Rsp/Sys: {(a:1*,2) (c:12*) (d:15.1*)} {(b:4*,5-7) (e:19*)}
+Expected: BCUB=1 [recall=5/5=1, prec=5/5=1]
+Expected: MUC=1 [recall=3/3=1, prec=3/3=1]
+
+TC-ZF-2 -- matching a zero only by its deps value: dependency zero match
+Key/Ref: {(a:1*,2) (c:12*) (d:15.1*)} {(b:4*,5-7) (e:19*)}
+Rsp/Sys: {(a:1*,2) (c:12*) (d:17.1*)} {(b:4*,5-7) (e:19*)}
+Expected: BCUB=1 [recall=5/5=1, prec=5/5=1]
+Expected: MUC=1 [recall=3/3=1, prec=3/3=1]
+
+TC-ZF-2 _linear -- linear zero match fails
+Key/Ref: {(a:1*,2) (c:12*) (d:15.1*)} {(b:4*,5-7) (e:19*)}
+Rsp/Sys: {(a:1*,2) (c:12*) (d:17.1*)} {(b:4*,5-7) (e:19*)}
+Expected: BCUB=1 [recall=5/5=1, prec=5/5=1]
+Expected: MUC=1 [recall=3/3=1, prec=3/3=1]
+
+TC-ZF-3 -- matching a zero only by the parent: dependency zero match
+Key/Ref: {(a:1*,2) (c:12*) (d:15.1*)} {(b:4*,5-7) (e:19*)}
+Rsp/Sys: {(a:1*,2) (c:12*) (d:17.1*)} {(b:4*,5-7) (e:19*)}
+Expected: BCUB=1 [recall=5/5=1, prec=5/5=1]
+Expected: MUC=1 [recall=3/3=1, prec=3/3=1]
+
+TC-ZF-3 _linear -- linear zero match fails
+Key/Ref: {(a:1*,2) (c:12*) (d:15.1*)} {(b:4*,5-7) (e:19*)}
+Rsp/Sys: {(a:1*,2) (c:12*) (d:17.1*)} {(b:4*,5-7) (e:19*)}
+Expected: BCUB=1 [recall=5/5=1, prec=5/5=1]
+Expected: MUC=1 [recall=3/3=1, prec=3/3=1]
+
+TC-ZF-4 -- two competing zeros belonging to different entities; dependency method matches the one with the correct deprel (wrong entity)
+Key/Ref: {(a:1*,2) (c:12*) (d:15.1*)} {(b:4*,5-7) (e:19*)}
+Rsp/Sys: {(a:1*,2) (c:12*) (xd:15.1*/15:dep)} {(b:4*,5-7) (d:13.1*/15:nsubj) (e:19*)}
+Expected: BCUB=22/37 [recall=11/15, prec=1/2]
+Expected: MUC=4/7 [recall=2/3, prec=1/2]
+
+TC-ZF-4 _linear -- two competing zeros belonging to different entities; linear method matches the one with the correct ord (correct entity)
+Key/Ref: {(a:1*,2) (c:12*) (d:15.1*)} {(b:4*,5-7) (e:19*)}
+Rsp/Sys: {(a:1*,2) (c:12*) (d:15.1*/15:dep)} {(b:4*,5-7) (xd:13.1*/15:nsubj) (e:19*)}
+Expected: BCUB=26/31 [recall=5/5=1, prec=13/18]
+Expected: MUC=6/7 [recall=3/3=1, prec=3/4]
+
+TC-ZF-5 -- two competing zeros belonging to different entities; dependency method matches the one with the correct deprel (wrong entity)
+Key/Ref: {(a:1*,2) (c:12*) (d:15.1*)} {(b:4*,5-7) (e:19*)}
+Rsp/Sys: {(a:1*,2) (c:12*) (xd:15.1*/15:dep)} {(b:4*,5-7) (d:13.1*/15:nsubj) (e:19*)}
+Expected: BCUB=22/37 [recall=11/15, prec=1/2]
+Expected: MUC=4/7 [recall=2/3, prec=1/2]
+
+TC-ZF-5 _linear -- two competing zeros belonging to different entities; linear method matches the one with the correct ord (correct entity)
+Key/Ref: {(a:1*,2) (c:12*) (d:15.1*)} {(b:4*,5-7) (e:19*)}
+Rsp/Sys: {(a:1*,2) (c:12*) (d:15.1*/15:dep)} {(b:4*,5-7) (xd:13.1*/15:nsubj) (e:19*)}
+Expected: BCUB=26/31 [recall=5/5=1, prec=13/18]
+Expected: MUC=6/7 [recall=3/3=1, prec=3/4]
