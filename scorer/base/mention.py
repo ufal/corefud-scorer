@@ -137,8 +137,8 @@ class Mention:
     def match_score(self, other, matching):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        if self.__eq__(other):
-            return 1.0
+        if matching == "zero-dependent":
+            return self.zero_dependent_match_score(other)
         if matching == "partial-craft":
             return self.craft_partial_match_score(other)
         if matching == "partial-corefud":
@@ -146,6 +146,8 @@ class Mention:
         if matching == "head":
             return self.head_match_score(other)
         # exact match
+        if self.__eq__(other):
+            return 1.0
         return 0.0
 
     # Default (with MIN tag) similar to the CorefUD that allow the response to be part of the key, in the

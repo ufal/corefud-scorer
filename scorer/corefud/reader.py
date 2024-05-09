@@ -114,8 +114,11 @@ class CorefUDReader(Reader):
             key_clusters, key_removed_singletons, key_removed_zeros = self.process_clusters(key_clusters)
             sys_clusters, sys_removed_singletons, sys_removed_zeros = self.process_clusters(sys_clusters)
 
-            key_mention_to_cluster, sys_mention_to_cluster, mention_alignment_dict = self.get_mention_assignments(
+            key_mention_to_cluster, sys_mention_to_cluster, mention_alignment_dict, mention_aligns = self.get_mention_assignments(
                 key_clusters, sys_clusters)
+
+            # store the mention alignments so that it can be used for analysis
+            self._doc_mention_aligns[docname] = mention_aligns
 
             # for an unknown reason, scorer.eval expects the tuple where
             # key_mention_to_cluster and sys_mention_to_cluster are

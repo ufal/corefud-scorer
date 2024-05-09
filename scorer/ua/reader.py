@@ -245,8 +245,11 @@ class UAReader(Reader):
 
             logging.debug(doc)
 
-            sys_mention_key_cluster, key_mention_sys_cluster, partial_match_dict = self.get_mention_assignments(
+            sys_mention_key_cluster, key_mention_sys_cluster, partial_match_dict, mention_aligns = self.get_mention_assignments(
                 key_clusters, sys_clusters)
+
+            # store the mention alignments so that it can be used for analysis
+            self._doc_mention_aligns[doc] = mention_aligns
 
             if self.evaluate_discourse_deixis:
                 self._doc_discourse_deixis_infos[doc] = (key_clusters, sys_clusters,
