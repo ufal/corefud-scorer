@@ -141,11 +141,12 @@ class Reader:
         logging.debug(f'Aligned zeros with zeros: {len(zero_aligns)}')
 
         # (2) get aligment of mentions with exact (or super-exact if head match) matching
-        exact_matched_key = {km for km in key_non_aligned if km in sys_non_aligned}
-        exact_matched_sys = {sm for sm in sys_non_aligned if sm in key_non_aligned}
-        exact_aligns = list(zip(sorted(exact_matched_key), sorted(exact_matched_sys)))
-        key_non_aligned = key_non_aligned - exact_matched_key
-        sys_non_aligned = sys_non_aligned - exact_matched_sys
+        exact_matched_key = {km: km for km in key_non_aligned if km in sys_non_aligned}
+        exact_matched_sys = {sm: sm for sm in sys_non_aligned if sm in key_non_aligned}
+        assert(set(exact_matched_key.keys()) == set(exact_matched_sys.keys()))
+        exact_aligns = [(exact_matched_key[km_key], exact_matched_sys[km_key]) for km_key in exact_matched_key]
+        key_non_aligned = key_non_aligned - set(exact_matched_key.values())
+        sys_non_aligned = sys_non_aligned - set(exact_matched_sys.values())
         logging.debug(f'Exactly or super-exactly matched mentions: {len(exact_aligns)}')
 
         # (3) filter out not yet aligned split antecedents
