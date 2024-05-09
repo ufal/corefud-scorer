@@ -77,7 +77,7 @@ class Reader:
                 if m in mention_to_clusterid:
                     logging.warning(
                         "Mention span {:s} has been already indexed with cluster_id = {:d}. New cluster_id = {:d}".format(
-                            str(m), mention_to_clusterid[m], cluster_id))
+                            str(m), mention_to_clusterid[m], clusterid))
                 mention_to_clusterid[m] = clusterid
         return mention_to_clusterid
 
