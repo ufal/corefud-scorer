@@ -400,8 +400,11 @@ class CoNLLReader(Reader):
                 sys_nested_coref_num += nested_mentions
                 sys_removed_nested_clusters += removed_clusters
 
-            sys_mention_key_cluster, key_mention_sys_cluster, partial_match_dict = self.get_mention_assignments(
+            sys_mention_key_cluster, key_mention_sys_cluster, partial_match_dict, mention_aligns = self.get_mention_assignments(
                 key_clusters, sys_clusters)
+
+            # store the mention alignments so that it can be used for analysis
+            self._doc_mention_aligns[doc] = mention_aligns
 
             self._doc_coref_infos[doc] = (key_clusters, sys_clusters,
                                           key_mention_sys_cluster, sys_mention_key_cluster, partial_match_dict)

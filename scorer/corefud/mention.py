@@ -84,6 +84,5 @@ class CorefUDMention(Mention):
             return len(self._wordsset & other._wordsset) * 1.0 / len(self._wordsset)
         return 0.0
     
-    #TODO to be implemented by Michal
-    def _zero_dependent_match_score(self,other):
+    def zero_dependent_match_score(self,other):
         return NotImplemented
