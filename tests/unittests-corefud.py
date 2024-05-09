@@ -826,3 +826,18 @@ def test_ZF5_linear():
   doc = read('TC-ZF.key', 'TC-ZF-5.response', matching="head", keep_zeros=True, zero_match_method="linear")
   assert evaluate(doc, b_cubed) == approx([5/5, 13/18, 26/31])
   assert evaluate(doc, muc) == approx([3/3, 3/4, 6/7])
+
+def test_ZG1():
+  doc = read('TC-ZG.key', 'TC-ZG-1.response', matching="head", keep_zeros=True, zero_match_method="dependent")
+  assert evaluate(doc, b_cubed) == approx([5/5, 5/5, 1])
+  assert evaluate(doc, muc) == approx([3/3, 3/3, 1])
+
+def test_ZG2():
+  doc = read('TC-ZG.key', 'TC-ZG-2.response', matching="head", keep_zeros=True, zero_match_method="dependent")
+  assert evaluate(doc, b_cubed) == approx([5/5, 13/18, 26/31])
+  assert evaluate(doc, muc) == approx([3/3, 3/4, 6/7])
+
+def test_ZG3():
+  doc = read('TC-ZG.key', 'TC-ZG-3.response', matching="head", keep_zeros=True, zero_match_method="dependent")
+  assert evaluate(doc, b_cubed) == approx([5/5, 13/18, 26/31])
+  assert evaluate(doc, muc) == approx([3/3, 3/4, 6/7])
