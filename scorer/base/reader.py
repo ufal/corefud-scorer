@@ -126,8 +126,8 @@ class Reader:
         key_non_aligned = key_mention_set.copy()
         sys_non_aligned = sys_mention_set.copy()
 
-        logging.debug('Total key mentions:', len(key_mention_set))
-        logging.debug('Total response mentions:', len(sys_mention_set))
+        logging.debug(f'Total key mentions: {len(key_mention_set)}')
+        logging.debug(f'Total response mentions: {len(sys_mention_set)}')
 
         # (1) obtain alignment between zeros by the dependent match method
         zero_aligns = []
@@ -138,7 +138,7 @@ class Reader:
                 zero_aligns = get_assignments_by_match_score(key_zeros, sys_zeros, "zero-dependent")
                 key_non_aligned = key_non_aligned - {km for km, sm in zero_aligns}
                 sys_non_aligned = sys_non_aligned - {sm for km, sm in zero_aligns}
-        logging.debug('Aligned zeros with zeros:', len(zero_aligns))
+        logging.debug(f'Aligned zeros with zeros: {len(zero_aligns)}')
 
         # (2) get aligment of mentions with exact (or super-exact if head match) matching
         exact_matched_key = {km for km in key_non_aligned if km in sys_non_aligned}
@@ -146,19 +146,19 @@ class Reader:
         exact_aligns = list(zip(sorted(exact_matched_key), sorted(exact_matched_sys)))
         key_non_aligned = key_non_aligned - exact_matched_key
         sys_non_aligned = sys_non_aligned - exact_matched_sys
-        logging.debug('Exactly or super-exactly matched mentions:', len(exact_aligns))
+        logging.debug(f'Exactly or super-exactly matched mentions: {len(exact_aligns)}')
 
         # (3) filter out not yet aligned split antecedents
         key_non_aligned = {km for km in key_non_aligned if not km.is_split_antecedent}
-        sys_non_aligned = {sm for sm in key_non_aligned if not sm.is_split_antecedent}
+        sys_non_aligned = {sm for sm in sys_non_aligned if not sm.is_split_antecedent}
 
         # (4) get alignment by any kind of partial matching
         partial_aligns = self.get_assignments_by_match_score(key_non_aligned, sys_non_aligned, self.matching)
         key_non_aligned = key_non_aligned - {km for km, sm in partial_aligns}
         sys_non_aligned = sys_non_aligned - {sm for km, sm in partial_aligns}
-        logging.debug('Partially correct identified mentions:', len(partial_aligns))
-        logging.debug('No identified:', len(key_non_aligned))
-        logging.debug('Invented:', len(sys_non_aligned))
+        logging.debug(f'Partially correct identified mentions: {len(partial_aligns)}')
+        logging.debug(f'No identified: {len(key_non_aligned)}')
+        logging.debug(f'Invented: {len(sys_non_aligned)}')
 
         return exact_aligns + partial_aligns + zero_aligns
 
