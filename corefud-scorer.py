@@ -12,12 +12,13 @@ def parse_arguments():
     argparser.add_argument('-s', '--keep-singletons', action='store_true', default=False, help='evaluate also singletons; ignored otherwise')
     argparser.add_argument('-a', '--match', type=str, choices=["exact", "partial", "head"], default="head", help='choose the type of mention matching: exact, partial, head')
     argparser.add_argument('-x', '--exact-match', action='store_true', default=False, help='use exact match for matching key and system mentions; overrides the value chosen by --match|-t')
+    argparser.add_argument('-z', '--zero-match-method', type=str, choices=["linear", "dependent"], default="dependent", help='if zeros are matched based on their position or based on their dependencies (default: "dependent")')
     args = argparser.parse_args()
     return vars(args)
 
 def corefud_to_ua_args(corefud_args):
     # arguments to copy with no change
-    ua_args = {k:v for k, v in corefud_args.items() if k in ["key_file", "sys_file", "metrics", "keep_singletons"]}
+    ua_args = {k:v for k, v in corefud_args.items() if k in ["key_file", "sys_file", "metrics", "keep_singletons", "zero_match_method"]}
     # arguments to be slightly modified
     if corefud_args["exact_match"]:
         ua_args["match"] = "exact"
@@ -29,7 +30,6 @@ def corefud_to_ua_args(corefud_args):
     ua_args["format"] = "corefud"
     ua_args["keep_split_antecedents"] = False
     ua_args["keep_zeros"] = True
-    ua_args["zero_match_method"] = 'linear'
     ua_args["evaluate_discourse_deixis"] = False
     ua_args["only_split_antecedent"] = False
     ua_args["allow_boundary_crossing"] = False

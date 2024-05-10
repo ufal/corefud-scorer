@@ -138,7 +138,7 @@ class Mention:
         if not isinstance(other, self.__class__):
             return NotImplemented
         if matching == "zero-dependent":
-            return self._zero_dependent_match_score(other)
+            return self.zero_dependent_match_score(other)
         if matching == "partial-craft":
             return self.craft_partial_match_score(other)
         if matching == "partial-corefud":

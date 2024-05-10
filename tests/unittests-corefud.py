@@ -10,12 +10,13 @@ from scorer.eval.evaluator import muc, b_cubed, ceafe, lea, ceafm, blancc, blanc
 TOL = 1e-4
 
 
-def read(key, response, matching="partial-corefud", keep_zeros=False):
+def read(key, response, matching="partial-corefud", keep_zeros=False, zero_match_method="linear"):
   args = {
     "format": 'corefud',
     "keep_singletons": True,
     "keep_zeros": keep_zeros,
     "match": matching,
+    "zero_match_method": zero_match_method,
   }
   reader = CorefUDReader(**args)
   test_dir_path = [
@@ -778,3 +779,65 @@ def test_ZE2_head():
   doc = read('TC-ZE.key', 'TC-ZE-2.response', matching="head", keep_zeros=True)
   assert evaluate(doc, b_cubed) == approx([26/36, 26/36, 26/36])
   assert evaluate(doc, muc) == approx([2/3, 2/3, 2/3])
+
+############## ZEROS WITH DEPENDENCY (AND SOMETIMES LINEAR) MATCHING (HEAD MATCH BY DEFAULT) ####################
+
+def test_ZF1():
+  doc = read('TC-ZF.key', 'TC-ZF-1.response', matching="head", keep_zeros=True, zero_match_method="dependent")
+  assert evaluate(doc, b_cubed) == approx([5/5, 5/5, 1])
+  assert evaluate(doc, muc) == approx([3/3, 3/3, 1])
+
+def test_ZF2():
+  doc = read('TC-ZF.key', 'TC-ZF-2.response', matching="head", keep_zeros=True, zero_match_method="dependent")
+  assert evaluate(doc, b_cubed) == approx([5/5, 5/5, 1])
+  assert evaluate(doc, muc) == approx([3/3, 3/3, 1])
+
+def test_ZF2_linear():
+  doc = read('TC-ZF.key', 'TC-ZF-2.response', matching="head", keep_zeros=True, zero_match_method="linear")
+  assert evaluate(doc, b_cubed) == approx([2/3, 2/3, 2/3])
+  assert evaluate(doc, muc) == approx([2/3, 2/3, 2/3])
+
+def test_ZF3():
+  doc = read('TC-ZF.key', 'TC-ZF-3.response', matching="head", keep_zeros=True, zero_match_method="dependent")
+  assert evaluate(doc, b_cubed) == approx([5/5, 5/5, 1])
+  assert evaluate(doc, muc) == approx([3/3, 3/3, 1])
+
+def test_ZF3_linear():
+  doc = read('TC-ZF.key', 'TC-ZF-3.response', matching="head", keep_zeros=True, zero_match_method="linear")
+  assert evaluate(doc, b_cubed) == approx([2/3, 2/3, 2/3])
+  assert evaluate(doc, muc) == approx([2/3, 2/3, 2/3])
+
+def test_ZF4():
+  doc = read('TC-ZF.key', 'TC-ZF-4.response', matching="head", keep_zeros=True, zero_match_method="dependent")
+  assert evaluate(doc, b_cubed) == approx([11/15, 1/2, 22/37])
+  assert evaluate(doc, muc) == approx([2/3, 1/2, 4/7])
+
+def test_ZF4_linear():
+  doc = read('TC-ZF.key', 'TC-ZF-4.response', matching="head", keep_zeros=True, zero_match_method="linear")
+  assert evaluate(doc, b_cubed) == approx([5/5, 13/18, 26/31])
+  assert evaluate(doc, muc) == approx([3/3, 3/4, 6/7])
+
+def test_ZF5():
+  doc = read('TC-ZF.key', 'TC-ZF-5.response', matching="head", keep_zeros=True, zero_match_method="dependent")
+  assert evaluate(doc, b_cubed) == approx([11/15, 1/2, 22/37])
+  assert evaluate(doc, muc) == approx([2/3, 1/2, 4/7])
+
+def test_ZF5_linear():
+  doc = read('TC-ZF.key', 'TC-ZF-5.response', matching="head", keep_zeros=True, zero_match_method="linear")
+  assert evaluate(doc, b_cubed) == approx([5/5, 13/18, 26/31])
+  assert evaluate(doc, muc) == approx([3/3, 3/4, 6/7])
+
+def test_ZG1():
+  doc = read('TC-ZG.key', 'TC-ZG-1.response', matching="head", keep_zeros=True, zero_match_method="dependent")
+  assert evaluate(doc, b_cubed) == approx([5/5, 5/5, 1])
+  assert evaluate(doc, muc) == approx([3/3, 3/3, 1])
+
+def test_ZG2():
+  doc = read('TC-ZG.key', 'TC-ZG-2.response', matching="head", keep_zeros=True, zero_match_method="dependent")
+  assert evaluate(doc, b_cubed) == approx([5/5, 13/18, 26/31])
+  assert evaluate(doc, muc) == approx([3/3, 3/4, 6/7])
+
+def test_ZG3():
+  doc = read('TC-ZG.key', 'TC-ZG-3.response', matching="head", keep_zeros=True, zero_match_method="dependent")
+  assert evaluate(doc, b_cubed) == approx([5/5, 13/18, 26/31])
+  assert evaluate(doc, muc) == approx([3/3, 3/4, 6/7])
