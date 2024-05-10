@@ -2,19 +2,22 @@
 
 ## About
 
-CorefUD acorer is a scorer for coreference and anaphoric relations that are harmonized under the same scheme defined by the [CorefUD](https://ufal.mff.cuni.cz/corefud) project.
+CorefUD scorer is a scorer for coreference relations represented in the CorefUD 1.0 format.
+It is an official scorer for the CRAC Shared Tasks on Multilingual Coreference Resolution.
+The shared task is one of the activities of the [CorefUD](https://ufal.mff.cuni.cz/corefud) project, which collects coreference and anaphora datasets of various languages and aims to harmonize them under the same scheme.
 
-The scorer builds on the following projects:
+The scorer builds on top of the [Universal Anaphora scorer (UA scorer)](https://github.com/juntaoy/universal-anaphora-scorer), currently on its version 2.0 <a href="https://aclanthology.org/2023.iwcs-1.19/">[Yu et al, 2023]</a>.
+At the same time, it is one of the main sources for the new features in the UA scorer.
 
-- [original Coreference scorer](https://github.com/conll/reference-coreference-scorers) [Pradhan et al, 2014] developed for scoring the CoNLL 2011 and 2012 shared tasks using the OntoNotes corpus [Pradhan et al, 2011; Pradhan et al, 2012],
-- its [reimplementation in Python by Moosavi](https://github.com/ns-moosavi/LEA-coreference-scorer), also extended to compute the LEA score [Moosavi and Strube, 2016] and to evaluate non-referring expressions and cover singletons [Poesio et al, 2018],
-- [Universal Anaphora scorer](https://github.com/juntaoy/universal-anaphora-scorer), which is an adaptation of the previous two scorers to the Universal Anaphora guidelines mostly implemented by Juntao Yu [Khosla et al, 2021], extended to evaluate also bridging, discourse deixis and split antecedents.
+It supports exact, partial and head match of mentions.
+Partial match is an alternative to minimum span evaluation by the UA scorer.
+Head match compares whether the mention heads are represented by identical tokens.
+In addition, the evaluation can be run with singletons taken into account.
 
-Unlike any of the previous scorers, CorefUD scorer is adjusted to process and correctly evaluate also non-contiguous mentions.
+TODO: CONTINUE HERE WITH DESCRIPTION OF ZERO MATCHING
+The scorer is also able to evaluate
 
-It supports exact, partial and head match of mentions. Partial match is an alternative to minimum span evaluation by the UA scorer. Head match compares whether the mention heads are represented by identical tokens. In addition, the evaluation can be run with singletons taken into account.
-
-For the time being, the scorer is able to evaluate coreference only, excluding split antecedents, bridging and other relations.
+The scorer is limited to evaluate coreference only, excluding split antecedents, bridging and other relations, as the latter relations are currently irrelevant for the shared task.
 
 ## Installation
 
@@ -255,6 +258,10 @@ The original reference Coreference Scorer (CoNLL 2012 scorer) was developed by:
   Marc Vilain, John Burger, John Aberdeen, Dennis Connolly, and Lynette Hirschman. 1995.
   A model theoretic coreference scoring scheme.
   In Proceedings of the 6th Message Understanding Conference, pages 45–52.
+
+  Juntao Yu, Michal Novák, Abdulrahman Aloraini, Nafise Sadat Moosavi, Silviu Paun, Sameer Pradhan, and Massimo Poesio. 2023.
+  The Universal Anaphora Scorer 2.0.
+  In Proceedings of the 15th International Conference on Computational Semantics, pages 183–194.
 
   Zdeněk Žabokrtský, Miloslav Konopík, Anna Nedoluzhko, Michal Novák, Maciej Ogrodniczuk, Martin Popel, Ondřej Pražák, Jakub Sido, Daniel Zeman, and Yilun Zhu. 2022.
   Findings of the Shared Task on Multilingual Coreference Resolution.
