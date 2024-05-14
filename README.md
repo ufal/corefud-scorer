@@ -225,7 +225,7 @@ Split antecedents, bridging and other anaphoric relations are not included into 
 
 ## Change Log
 
-* 2024-05-01 v1.2
+* 2024-05-10 v1.2
   * using a modified version of the UA scorer 2.0 as the backbone
   * key and response zeros don't have to be present at the same positions; instead the `linear` and `dependent` strategy can be alternatively used to align zeros
 * 2023-02-15 v1.1
