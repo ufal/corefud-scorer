@@ -7,15 +7,15 @@ It is an official scorer for the CRAC Shared Tasks on Multilingual Coreference R
 The shared task is one of the activities of the [CorefUD](https://ufal.mff.cuni.cz/corefud) project, which collects coreference and anaphora datasets of various languages and aims to harmonize them under the same scheme.
 
 The scorer builds on top of the [Universal Anaphora scorer (UA scorer)](https://github.com/juntaoy/universal-anaphora-scorer), currently on its version 2.0 <a href="https://aclanthology.org/2023.iwcs-1.19/">[Yu et al, 2023]</a>.
-At the same time, it is one of the main sources for the new features in the UA scorer.
+At the same time, the CorefUD scorer is one of the sources for the new features in the UA scorer.
 
 It supports exact, partial and head match of mentions.
-Partial match is an alternative to minimum span evaluation by the UA scorer.
-Head match compares whether the mention heads are represented by identical tokens.
-In addition, the evaluation can be run with singletons taken into account.
+Whereas partial match is an alternative to minimum span evaluation by the UA scorer, head match compares whether the mention heads are represented by identical tokens.
+The scorer is also able to evaluate zero anaphora, using two alternative strategies to match key zero mentions to response zero mentions: linear and dependency.
 
-TODO: CONTINUE HERE WITH DESCRIPTION OF ZERO MATCHING
-The scorer is also able to evaluate
+The CorefUD scorer supports all standard metrics used for coreference, e.g. MUC, B-cubed, CEAF, BLANC and LEA.
+In addition, is is able to compute the Mention Overlap Ratio and Anaphor-decomposable score, introduced for the CRAC 2022 Shared Task.
+Optionally, the evaluation can be run with singletons taken into account.
 
 The scorer is limited to evaluate coreference only, excluding split antecedents, bridging and other relations, as the latter relations are currently irrelevant for the shared task.
 
@@ -40,6 +40,7 @@ Options:
 - `-s, --keep-singletons`: evaluate also singletons; otherwise any singletons in the key or system files are ignored
 - `-a, --match`: select the way of mention matching; default: `head`; possible values: `[exact|partial|head]`
 - `-x, --exact-match`: a shortcut for enabling exact matching; corresponds to `-a exact`
+- `-z, --zero-match-method`: choose the method for matching zero mentions; default: `dependent`; possible values: `[dependent|linear]`
 
 ## Details
 
@@ -54,14 +55,16 @@ The coreference information must be formatted in the [CorefUD 1.0 style](https:/
 The scorer does not check most of the morpho-syntactic features required by the CoNLL-U format.
 For most fields, `_` symbol may be used instead of the true values, `0` value for the `HEAD` field.
 
-However, the two input files must be aligned.
+However, the two input files must be aligned, besides the empty tokens.
 Otherwise, the evaluation fails.
 Specifically, the evaluation scripts checks if the following requirements are fulfilled:
 1. both files must contain the same number of sentences with exactly the same IDs (`# sent_id`);
-2. each pair of sentences must contain the same words/tokens, i.e. both their count and forms (the `FORM` field) must be the same;
+2. each pair of sentences must consist of the same sequences of non-empty words/tokens, i.e. sequences of forms (the `FORM` field) must be the same; note that empty nodes are excluded from this alignment check
 3. document separators (`# newdoc`) must be exactly at the same places.
 
-The easiest way to satisfy all the requirements above is to ensure that the key and response files differ only in the coreference annotation in the `MISC` field.
+The easiest way to satisfy all the requirements above is to ensure that the key and response files differ only in coreference annotation in the `MISC` field, and possibly in empty token.
+
+*Changed in version 1.2: Empty tokens are excluded from the alignment tests of the key and response file tokens.*
 
 ### Evaluation Metrics
 
@@ -100,7 +103,12 @@ This can be controlled by the `-a, --match [exact|partial|head]` option.
 As a shortcut, the `-x, --exact-match` option switches on exact matching and is thus equivalent to `-a exact`.
 By default, mentions are compared with head matching.
 
+All three methods seek for 1-to-1 correspondence between key and response mentions.
+That is, no key mention is allowed to match multiple response mentions, and vice versa.
+On the other hand, it is absolutely valid if some key or response mentions remain unmatched.
+
 *Changed in version 1.1: default matching changed from partial to head.*
+*Changed in version 1.2: a bug that allowed for 1-to-n matching between the response and key mentions has been fixed by adopting the implementation of matching from the UA scorer 2.0.*
 
 #### Exact Matching
 
@@ -134,7 +142,7 @@ In the following example, the 3rd word of the mention `the viewing experience of
 ```
 
 In partial matching, each key mention is represented by all its words and its head (unlike in exact matching, where heads of key mentions are ignored).
-On the other hand, the only information on response mentions the scorer keeps are the words that the mention consists of.
+On the other hand, the only information on response mentions the scorer takes into account in the partial matching strategy are the words that the mention consists of.
 Even though marking mention head index in CorefUD 1.0 format is mandatory, heads of response mentions are simply ignored during evaluation with partial matching.
 
 #### Head Matching
@@ -148,7 +156,39 @@ However, full spans can be taken into account but only to disambiguate between m
 In order for a coreference resolver to succeed with respect to head matching, it should focus on predicting not only the mention span but also its head.
 If the resolver is able to predict mention spans only (and, for instance, sets each mention head index to value `1`, selecting always the first word of a mention as its head), mention heads can be estimated using the dependency tree obtained by a parser (the CorefUD data already contain annotation of dependency syntax) and some heuristics, e.g. [the one provided by Udapi](https://github.com/udapi/udapi-python/blob/master/udapi/block/corefud/movehead.py).
 
-#### Discontinuous mentions
+### Matching of Zero Mentions
+
+Zero mention referes to a mention whose head token is an empty token.
+Most commonly, the empty token comprises the entire mention, as in the case of dropped pronouns.
+However, it can also consist of multiple tokens, particularly with elided verbs or nouns.
+
+Starting from version 1.2, the CorefUD scorer relaxes the rules for empty token alignment.
+Empty tokens are no longer subjected to strict checks for alignment between the tokens in the key and response files.
+This means that empty tokens present in one file may be missing from the other, or they may appear at different surface positions within the sentence, yet play the same role.
+If two zero mentions are governed by such empty tokens, they are still expected to be matched.
+
+The CorefUD scorer implements two alternative methods for matching key and response zeros: linear and dependency (enabled by the `linear` and `dependent` value of the `--zero-match-method` option, respectively).
+
+The linear method treats zero mentions similarly to other mentions.
+Regardless of the selected matching method (exact, partial or head), the candidate mentions are compared based on the token ord numbers represented by the values in the `ID` field.
+However, this simplistic strategy can lead to incorrect alignments.
+For example, consider a sentence with both subject and object pronouns dropped.
+The key file represent them as empty nodes with IDs `x.1` and `x.2`, respectively.
+If a coreference resolver reconstructs them in a reversed order or reconstructs just the object pronoun with ID `x.1`, the linear method produces an incorrect matching of zero mentions, affecting the reliability of coreference scores.
+
+The dependency-based method adresses this issue by looking for the matching of zeros within the same sentence that maximizes the F-score of predicting dependencies in the `DEPS` field that the zeros are involved in.
+Specifically, the task is cast as searching for a 1-to-1 matching in a weighted bipartite graph (with key mentions and sys mentions as partitions) to maximize the total sum of weights in the matching.
+Each candidate pair (key zero, sys zero) is weighed with a non-zero score only if the two zeros belong to the same sentence.
+The score is then calculated as a weighted sum of two features:
+- the F-score of the key zero dependencies (in the `DEPS` field) predicted in the response zero, considering both parent and dependency type assignments (weighted by a factor of 10);
+- the F-score of the key zero dependencies (in the `DEPS` field) predicted in the response zero, considering only parent assignments (weighed by a factor of 1).
+The scoring system prioritizes exact assignment of both parents and types, while parent assignments without considering dependency types should only serve to break ties.
+
+Note that matching zero mentions by their dependencies is applied first, preceding the other matching strategies.
+Zeros that have not been matched to other zeros may then be matched to non-zero mentions.
+Although such matching may seem counterintuitive, it can be valid in cases where a zero response mention is incorrectly labeled as non-zero, or vice versa, often due to the wrong choice of the head in multi-token mentions involving empty tokens.
+
+### Discontinuous mentions
 
 CorefUD scorer allows for evaluating discontinuous mentions in any of the input files.
 This is why mention matching is based on set-subset relations between sets of words in mentions, instead of comparing positions of mention starts and ends, which is usual in previous scorers, e.g. in CoNLL 2012 scorer and UA scorer 1.0.
@@ -177,10 +217,17 @@ Split antecedents, bridging and other anaphoric relations were not included into
 The primary score to rank the submissions is the macro-average of the CoNLL F1 of identity coreference calculated for each dataset, computed without singletons using head matching.
 Split antecedents, bridging and other anaphoric relations are not included into the evaluation.
 
+### CRAC 2024
+
+[CRAC 2024 Shared Task on Multilingual Coreference Resolution](https://ufal.mff.cuni.cz/corefud/crac24) uses this scorer in version 1.2 as an official scorer to evaluate the submissions.
+The primary score to rank the submissions is the macro-average of the CoNLL F1 of identity coreference calculated for each dataset, computed without singletons using head matching and aligning zero by their dependency.
+Split antecedents, bridging and other anaphoric relations are not included into the evaluation.
+
 ## Change Log
 
 * 2024-05-01 v1.2
   * using a modified version of the UA scorer 2.0 as the backbone
+  * key and response zeros don't have to be present at the same positions; instead the `linear` and `dependent` strategy can be alternatively used to align zeros
 * 2023-02-15 v1.1
   * mention overlap score added
   * anaphor-decomposable score for zeros added
