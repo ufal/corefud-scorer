@@ -190,7 +190,7 @@ Note that matching zero mentions by their dependencies is applied first, precedi
 Zeros that have not been matched to other zeros may then be matched to non-zero mentions.
 Although such matching may seem counterintuitive, it can be valid in cases where a zero response mention is incorrectly labeled as non-zero, or vice versa, often due to the wrong choice of the head in multi-token mentions involving empty tokens.
 
-### Discontinuous mentions
+### Discontinuous Mentions
 
 CorefUD scorer allows for evaluating discontinuous mentions in any of the input files.
 This is why mention matching is based on set-subset relations between sets of words in mentions, instead of comparing positions of mention starts and ends, which is usual in previous scorers, e.g. in CoNLL 2012 scorer and UA scorer 1.0.
@@ -260,6 +260,60 @@ The original reference Coreference Scorer (CoNLL 2012 scorer) was developed by:
 *  Sameer Pradhan, https://cemantix.org, pradhan@cemantix.org
 *  Sebastian Martschat, sebastian.martschat@h-its.org
 *  Xiaoqiang Luo, xql@google.com
+
+## How to Cite
+```
+@inproceedings{zabokrtsky-etal-2022-findings,
+    title = "Findings of the Shared Task on Multilingual Coreference Resolution",
+    author = "{\v{Z}}abokrtsk{\'y}, Zden{\v{e}}k  and
+      Konop{\'i}k, Miloslav  and
+      Nedoluzhko, Anna  and
+      Nov{\'a}k, Michal  and
+      Ogrodniczuk, Maciej  and
+      Popel, Martin  and
+      Pra{\v{z}}{\'a}k, Ond{\v{r}}ej  and
+      Sido, Jakub  and
+      Zeman, Daniel  and
+      Zhu, Yilun",
+    editor = "{\v{Z}}abokrtsk{\'y}, Zden{\v{e}}k  and
+      Ogrodniczuk, Maciej",
+    booktitle = "Proceedings of the CRAC 2022 Shared Task on Multilingual Coreference Resolution",
+    month = oct,
+    year = "2022",
+    address = "Gyeongju, Republic of Korea",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2022.crac-mcr.1/",
+    pages = "1--17",
+    abstract = "This paper presents an overview of the shared task on multilingual coreference resolution associated with the CRAC 2022 workshop. Shared task participants were supposed to develop trainable systems capable of identifying mentions and clustering them according to identity coreference. The public edition of CorefUD 1.0, which contains 13 datasets for 10 languages, was used as the source of training and evaluation data. The CoNLL score used in previous coreference-oriented shared tasks was used as the main evaluation metric. There were 8 coreference prediction systems submitted by 5 participating teams; in addition, there was a competitive Transformer-based baseline system provided by the organizers at the beginning of the shared task. The winner system outperformed the baseline by 12 percentage points (in terms of the CoNLL scores averaged across all datasets for individual languages)."
+}
+
+@inproceedings{novak-etal-2024-findings,
+    title = "Findings of the Third Shared Task on Multilingual Coreference Resolution",
+    author = "Nov{\'a}k, Michal  and
+      Dohnalov{\'a}, Barbora  and
+      Konopik, Miloslav  and
+      Nedoluzhko, Anna  and
+      Popel, Martin  and
+      Prazak, Ondrej  and
+      Sido, Jakub  and
+      Straka, Milan  and
+      {\v{Z}}abokrtsk{\'y}, Zden{\v{e}}k  and
+      Zeman, Daniel",
+    editor = "Ogrodniczuk, Maciej  and
+      Nedoluzhko, Anna  and
+      Poesio, Massimo  and
+      Pradhan, Sameer  and
+      Ng, Vincent",
+    booktitle = "Proceedings of The Seventh Workshop on Computational Models of Reference, Anaphora and Coreference",
+    month = nov,
+    year = "2024",
+    address = "Miami",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.crac-1.8/",
+    doi = "10.18653/v1/2024.crac-1.8",
+    pages = "78--96"
+}
+```
 
 ## References
   
